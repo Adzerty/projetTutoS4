@@ -34,16 +34,13 @@ public class PanelUnivers extends JPanel implements KeyListener
         {
             while (true)
             {
-                vaisseau.setEnsCoord(vaisseau.getMaskAlpha());
                 for(Planete p : planetes)
                 {
-                    
                     Coordonnees coordPlanet = p.getCoord();
-
-                    for(Coordonnees coordContour : vaisseau.getEnsCoord())
+                    for(Coordonnees coordContour : this.vaisseau.getEnsCoord())
                     {
-                        double distance = Math.sqrt( Math.pow(coordContour.getX() - coordPlanet.getX(),2) + Math.pow(coordContour.getY() - coordPlanet.getY(),2));
-                        System.out.println(distance);
+                        double distance = Math.sqrt( Math.pow( coordPlanet.getX() - coordContour.getX()+ (this.vaisseau.getPosX()* Math.cos(Math.toRadians(this.vaisseau.getAngleRot()))) ,2) +  Math.pow( coordPlanet.getY() - coordContour.getY() + (this.getY() * Math.sin(Math.toRadians(this.vaisseau.getAngleRot()))),2));
+
                         if(distance <= p.getTaille())
                         {
                             System.out.println("BOOM");

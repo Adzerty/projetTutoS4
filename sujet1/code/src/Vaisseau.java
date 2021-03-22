@@ -129,6 +129,7 @@ public class Vaisseau {
         return instance;
     }
 
+
     private BufferedImage generateContour(BufferedImage mask) {
         this.ensCoord = new ArrayList<>();
         BufferedImage imageToReturn = new BufferedImage(maskAlpha.getWidth(), maskAlpha.getHeight(), BufferedImage.TYPE_INT_ARGB);
