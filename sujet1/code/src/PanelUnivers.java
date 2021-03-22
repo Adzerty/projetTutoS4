@@ -44,7 +44,7 @@ public class PanelUnivers extends JPanel implements KeyListener
     }
     public void rotateImage(double angle)
     {
-        vaisseau.setAngleRot(vaisseau.getAngleRot()- Math.toRadians(angle));
+        vaisseau.setAngleRot(vaisseau.getAngleRot()+ Math.toRadians(angle));
         repaint();
     }
 
@@ -61,12 +61,12 @@ public class PanelUnivers extends JPanel implements KeyListener
         }
         else if (e.getKeyCode()==KeyEvent.VK_RIGHT)
         {
-            rotateImage(2);
+            rotateImage(2.00);
         }
 
         else if (e.getKeyCode()==KeyEvent.VK_LEFT)
         {
-            rotateImage(-2);
+            rotateImage(-2.00);
         }
     }
 

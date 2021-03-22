@@ -79,12 +79,13 @@ public class Vaisseau
                     instanceVaisseau.vitesseX = instanceVaisseau.vitesseX + (instanceVaisseau.acceleration * Math.cos(instanceVaisseau.angleRot));
                     instanceVaisseau.vitesseY = instanceVaisseau.vitesseY + (instanceVaisseau.acceleration * Math.sin(instanceVaisseau.angleRot));
                 } else {
-                    if(instanceVaisseau.vitesseX <= 0 && instanceVaisseau.vitesseY <= 0) {
+                    if(instanceVaisseau.vitesseX <= 0.001 && instanceVaisseau.vitesseY <= 0.001) {
                         instanceVaisseau.vitesseX = 0;
                         instanceVaisseau.vitesseY = 0;
                     } else {
-                        instanceVaisseau.vitesseX = instanceVaisseau.vitesseX * ((vitesse() - (instanceVaisseau.deltaT * 0.0001))/vitesse());
-                        instanceVaisseau.vitesseY = instanceVaisseau.vitesseY * ((vitesse() - (instanceVaisseau.deltaT * 0.0001))/vitesse());
+                        double vitesse = vitesse();
+                        instanceVaisseau.vitesseX = instanceVaisseau.vitesseX * ((vitesse - (instanceVaisseau.deltaT * 0.0001))/vitesse);
+                        instanceVaisseau.vitesseY = instanceVaisseau.vitesseY * ((vitesse - (instanceVaisseau.deltaT * 0.0001))/vitesse);
                     }
                 }
 
@@ -281,7 +282,7 @@ public class Vaisseau
     }
 
     public void setAngleRot(double angleRot) {
-        instanceVaisseau.angleAff = angleAff + instanceVaisseau.angleRot - angleRot;
+        instanceVaisseau.angleAff = angleAff -( instanceVaisseau.angleRot - angleRot);
         instanceVaisseau.angleRot = angleRot;
     }
 
