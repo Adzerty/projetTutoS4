@@ -24,14 +24,6 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.addKeyListener(this);
 
         this.vaisseau.startDeplacement();
-
-        coods = this.vaisseau.getCoords();
-        Thread dep = new Thread(() -> {
-            while (true) {
-                if (coods != this.vaisseau.getCoords()) System.out.println("test");this.repaint(); coods = this.vaisseau.getCoords();
-            }
-        });
-        dep.start();
     }
 
     public void setCoods(Coordonnees coods) {
@@ -75,7 +67,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         }
         else if (e.getKeyCode()==KeyEvent.VK_UP)
         {
-            if(vaisseau.getAcceleration()+0.01<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
+            if(vaisseau.getAcceleration()+0.001<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
         }
     }
 
