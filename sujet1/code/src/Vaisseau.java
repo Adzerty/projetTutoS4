@@ -24,6 +24,7 @@ public class Vaisseau
     private double deltaT;
     private double lastTime;
     private double angleRot;
+    private double angleAff;
 
     private ArrayList<Coordonnees> ensCoord = new ArrayList<Coordonnees>();
 
@@ -32,6 +33,7 @@ public class Vaisseau
 
     private Vaisseau()
     {
+        this.angleAff = 0;
         this.angleRot = Math.PI/2;
         this.deltaT = 0;
         this.lastTime =0;
@@ -73,20 +75,26 @@ public class Vaisseau
                 instanceVaisseau.deltaT = System.currentTimeMillis() - instanceVaisseau.lastTime;
                 instanceVaisseau.lastTime = System.currentTimeMillis();
 
-                if (vitesse() < VITESSE_MAX) {
+                if (instanceVaisseau.acceleration != 0) {
                     instanceVaisseau.vitesseX = instanceVaisseau.vitesseX + (instanceVaisseau.acceleration * Math.cos(instanceVaisseau.angleRot));
                     instanceVaisseau.vitesseY = instanceVaisseau.vitesseY + (instanceVaisseau.acceleration * Math.sin(instanceVaisseau.angleRot));
-                    //System.out.println("vitesse : " +instanceVaisseau.vitesse());
+                } else {
+                    if(instanceVaisseau.vitesseX <= 0 && instanceVaisseau.vitesseY <= 0) {
+                        instanceVaisseau.vitesseX = 0;
+                        instanceVaisseau.vitesseY = 0;
+                    } else {
+                        instanceVaisseau.vitesseX = instanceVaisseau.vitesseX * ((vitesse() - (instanceVaisseau.deltaT * 0.0001))/vitesse());
+                        instanceVaisseau.vitesseY = instanceVaisseau.vitesseY * ((vitesse() - (instanceVaisseau.deltaT * 0.0001))/vitesse());
+                    }
                 }
 
                 instanceVaisseau.getCoords().setX((int) (instanceVaisseau.getCoords().getX() + (instanceVaisseau.vitesseX * instanceVaisseau.deltaT)));
                 instanceVaisseau.getCoords().setY((int) (instanceVaisseau.getCoords().getY() + (instanceVaisseau.vitesseY * instanceVaisseau.deltaT)));
 
-                if (instanceVaisseau.acceleration > 0) instanceVaisseau.acceleration -= 0.01;
                 instanceVaisseau.panelUnivers.repaint();
 
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -272,7 +280,9 @@ public class Vaisseau
         return angleRot;
     }
 
-    public void setAngleRot(double angleRot) { instanceVaisseau.angleRot = angleRot;
+    public void setAngleRot(double angleRot) {
+        instanceVaisseau.angleAff = angleAff + instanceVaisseau.angleRot - angleRot;
+        instanceVaisseau.angleRot = angleRot;
     }
 
     public ArrayList<Coordonnees> getEnsCoord() {
@@ -283,4 +293,8 @@ public class Vaisseau
         this.ensCoord = ensCoord;
     }
     public double vitesse() { return  Math.sqrt(Math.pow(this.vitesseX,2)+Math.pow(this.vitesseY,2)); }
+
+    public double getAngleAff() {
+        return this.angleAff;
+    }
 }

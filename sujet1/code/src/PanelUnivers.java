@@ -38,13 +38,13 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
 
-        g2.rotate(vaisseau.getAngleRot(), vaisseau.getxBarycentre()+vaisseau.getCoords().getX(), vaisseau.getyBarycentre()+vaisseau.getCoords().getY());
+        g2.rotate(vaisseau.getAngleAff(), vaisseau.getxBarycentre()+vaisseau.getCoords().getX(), vaisseau.getyBarycentre()+vaisseau.getCoords().getY());
         g2.drawImage(vaisseau.getImage(), vaisseau.getCoords().getX(), vaisseau.getCoords().getY(),this);
 
     }
     public void rotateImage(double angle)
     {
-        vaisseau.setAngleRot(vaisseau.getAngleRot()+ Math.toRadians(angle));
+        vaisseau.setAngleRot(vaisseau.getAngleRot()- Math.toRadians(angle));
         repaint();
     }
 
@@ -55,26 +55,27 @@ public class PanelUnivers extends JPanel implements KeyListener
 
     @Override
     public void keyPressed(KeyEvent e) {
-
-        if (e.getKeyCode()==KeyEvent.VK_RIGHT)
+        if (e.getKeyCode()==KeyEvent.VK_UP)
         {
-            rotateImage(5);
+            if(vaisseau.getAcceleration()+0.001<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.005);
+        }
+        else if (e.getKeyCode()==KeyEvent.VK_RIGHT)
+        {
+            rotateImage(2);
         }
 
         else if (e.getKeyCode()==KeyEvent.VK_LEFT)
         {
-            rotateImage(-5);
-        }
-        else if (e.getKeyCode()==KeyEvent.VK_UP)
-        {
-            if(vaisseau.getAcceleration()+0.001<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
+            rotateImage(-2);
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e)
     {
-        if (e.getKeyCode()==KeyEvent.VK_UP) this.vaisseau.setAcceleration(0);
+        if (e.getKeyCode()==KeyEvent.VK_UP) {
+            this.vaisseau.setAcceleration(0);
+        }
     }
 
 
