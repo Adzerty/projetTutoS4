@@ -4,44 +4,54 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Vaisseau
-{
-    private static Vaisseau instanceVaisseau = new Vaisseau();
+public class Vaisseau {
+    private static Vaisseau instance = new Vaisseau();
 
-    private static final String IMAGE_PATH = "/rocket-1.png";
-    private Coordonnees coords;
+    private static final String IMAGE_PATH = "/rocket-2.png";
+
+
+
     private BufferedImage image;
     private BufferedImage maskAlpha;
     private BufferedImage contour;
 
     private int xBarycentre;
     private int yBarycentre;
-    private double acceleration;
-    private double vitesseX;
-    private double vitesseY;
-    private static final double VITESSE_MIN = 0.0001;
-    private static final double VITESSE_MAX = 0.100;
+
+    //ATTRIBUTS POUR LE DEPLACEMENT DU VAISSEAU
+    // ----------------------------------------
+    //rotation
+    private double angleRot = 0;
+
+    //position
+    private double posX;
+    private double posY;
+
+    //vitesse
+    private final double MAX_VITESSE = 0.100;
+    private final double MIN_VITESSE = 0.0001;
+    private Vecteur vitesse = new Vecteur(0,0);
+
+    //acceleration
+    private double acceleration = 0;
+    private double decelerarion = 0.00001;
+
+    //temps
     private double deltaT;
-    private double lastTime;
-    private double angleRot;
-    private double angleAff;
+    private double tpsDebut;
+    private double tpsFin;
+    // ----------------------------------------
+
 
     private ArrayList<Coordonnees> ensCoord = new ArrayList<Coordonnees>();
-
     private PanelUnivers panelUnivers;
 
 
     private Vaisseau()
     {
-        this.angleAff = 0;
-        this.angleRot = Math.PI/2;
-        this.deltaT = 0;
-        this.lastTime =0;
-        this.vitesseX =0;
-        this.vitesseY =0;
-        this.acceleration = 0;
+        this.posX = 250;
+        this.posY = 250;
 
-        this.coords = new Coordonnees(250,250);
         try {
             image = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
             this.maskAlpha = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
@@ -49,17 +59,16 @@ public class Vaisseau
         } catch (IOException ex) {
             System.out.println(image);
         }
-        for(int i = 0; i<image.getHeight(); i++)
-        {
-            for(int j = 0; j<image.getWidth(); j++)
-            {
-                Color c = new Color(image.getRGB(j,i), true);
-                if(c.getAlpha() > 0)
-                {
-                    maskAlpha.setRGB(j,i,0xFF000000);
+
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                Color c = new Color(image.getRGB(j, i), true);
+                if (c.getAlpha() > 0) {
+                    maskAlpha.setRGB(j, i, 0xFF000000);
                 }
             }
         }
+
         this.contour = generateContour(maskAlpha);
         findBarycentre();
     }
@@ -68,81 +77,82 @@ public class Vaisseau
         this.panelUnivers = panelUnivers;
     }
 
+
     public void startDeplacement()
     {
-        Thread dep = new Thread(() -> {
-            while (true) {
-                instanceVaisseau.deltaT = System.currentTimeMillis() - instanceVaisseau.lastTime;
-                instanceVaisseau.lastTime = System.currentTimeMillis();
+        Thread dep = new Thread(() ->
+        {
+            while (true)
+            {
+                Vaisseau v = Vaisseau.getInstance();
 
-                if (instanceVaisseau.acceleration != 0) {
-                    instanceVaisseau.vitesseX = instanceVaisseau.vitesseX + (instanceVaisseau.acceleration * Math.cos(instanceVaisseau.angleRot));
-                    instanceVaisseau.vitesseY = instanceVaisseau.vitesseY + (instanceVaisseau.acceleration * Math.sin(instanceVaisseau.angleRot));
-                } else {
-                    if(instanceVaisseau.vitesseX <= 0.001 && instanceVaisseau.vitesseY <= 0.001) {
-                        instanceVaisseau.vitesseX = 0;
-                        instanceVaisseau.vitesseY = 0;
-                    } else {
-                        double vitesse = vitesse();
-                        instanceVaisseau.vitesseX = instanceVaisseau.vitesseX * ((vitesse - (instanceVaisseau.deltaT * 0.0001))/vitesse);
-                        instanceVaisseau.vitesseY = instanceVaisseau.vitesseY * ((vitesse - (instanceVaisseau.deltaT * 0.0001))/vitesse);
-                    }
+                v.tpsDebut = System.currentTimeMillis();
+                v.deltaT = v.tpsDebut - v.tpsFin;
+
+                if(vitesse.calculNormeAvecDeuxValeurs(
+                        v.vitesse.getvX() + v.acceleration * Math.cos(Math.toRadians(v.angleRot)),
+                        v.vitesse.getvY()) + v.acceleration * Math.sin(Math.toRadians(v.angleRot))
+                        < MAX_VITESSE )
+                {
+                    v.vitesse.setvX(v.vitesse.getvX() + v.acceleration * Math.cos(Math.toRadians(v.angleRot)));
+                    v.vitesse.setvY(v.vitesse.getvY() + v.acceleration * Math.sin(Math.toRadians(v.angleRot)));
                 }
 
-                instanceVaisseau.getCoords().setX((int) (instanceVaisseau.getCoords().getX() + (instanceVaisseau.vitesseX * instanceVaisseau.deltaT)));
-                instanceVaisseau.getCoords().setY((int) (instanceVaisseau.getCoords().getY() + (instanceVaisseau.vitesseY * instanceVaisseau.deltaT)));
+                v.posX = v.posX + (v.vitesse.getvX() * deltaT);
+                v.posY = v.posY + (v.vitesse.getvY() * deltaT);
 
-                instanceVaisseau.panelUnivers.repaint();
+                Vecteur vitInit = new Vecteur(v.vitesse.getvX(), v.vitesse.getvY());
+                double vitFinal = vitInit.getNorme() - (deltaT * decelerarion);
 
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(vitInit.getNorme() != 0)
+                {
+                    v.vitesse.setvX(v.vitesse.getvX() * (vitFinal / vitInit.getNorme()));
+                    v.vitesse.setvY(v.vitesse.getvY() * (vitFinal / vitInit.getNorme()));
                 }
+
+                if(v.vitesse.getNorme() < MIN_VITESSE)
+                {
+                    v.vitesse.setvX(0);
+                    v.vitesse.setvY(0);
+                }
+
+                v.panelUnivers.repaint();
+
+                v.tpsFin = System.currentTimeMillis();
+                try {Thread.sleep(10);} catch(InterruptedException e){e.printStackTrace();}
             }
         });
         dep.start();
     }
-    public static Vaisseau getInstanceVaisseau() {
-        return instanceVaisseau;
+
+    public static Vaisseau getInstance() {
+        return instance;
     }
 
-    public static void setInstanceVaisseau(Vaisseau instanceVaisseau) {
-        Vaisseau.instanceVaisseau = instanceVaisseau;
-    }
+    private BufferedImage generateContour(BufferedImage mask) {
+        BufferedImage imageToReturn = new BufferedImage(maskAlpha.getWidth(), maskAlpha.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-    private BufferedImage generateContour(BufferedImage mask)
-    {
-        BufferedImage imageToReturn = new BufferedImage(maskAlpha.getWidth(), maskAlpha.getHeight(),BufferedImage.TYPE_INT_ARGB);
-
-        for(int i = 0; i<maskAlpha.getHeight(); i++)
-        {
-            for (int j = 0; j < maskAlpha.getWidth(); j++)
-            {
-                if(image.getRGB(j,i) != 0xFF000000)
-                {
-                    for(int y = -1; y<2; y++)
-                    {
-                        for(int x = -1; x<2; x++)
-                        {
-                            try{
-                                if(maskAlpha.getRGB(j+x, i+y) == 0xFF000000)
-                                {
-                                    Coordonnees coordTmp = new Coordonnees(j+x, i+y);
+        for (int i = 0; i < maskAlpha.getHeight(); i++) {
+            for (int j = 0; j < maskAlpha.getWidth(); j++) {
+                if (image.getRGB(j, i) != 0xFF000000) {
+                    for (int y = -1; y < 2; y++) {
+                        for (int x = -1; x < 2; x++) {
+                            try {
+                                if (maskAlpha.getRGB(j + x, i + y) == 0xFF000000) {
+                                    Coordonnees coordTmp = new Coordonnees(j + x, i + y);
                                     ensCoord.add(coordTmp);
                                 }
-                            }catch(Exception e) {}
+                            } catch (Exception e) {
+                            }
 
                         }
                     }
 
-                }else
-                {
-                    if( j == maskAlpha.getWidth()-1         ||
-                            j == 0                         ||
-                            i == maskAlpha.getHeight()-1    ||
-                            i == 0)
-                    {
+                } else {
+                    if (j == maskAlpha.getWidth() - 1 ||
+                            j == 0 ||
+                            i == maskAlpha.getHeight() - 1 ||
+                            i == 0) {
                         Coordonnees coordTmp = new Coordonnees(j, i);
                         ensCoord.add(coordTmp);
                     }
@@ -150,8 +160,7 @@ public class Vaisseau
             }
         }
 
-        for(Coordonnees coordTmp : ensCoord)
-        {
+        for (Coordonnees coordTmp : ensCoord) {
             imageToReturn.setRGB(coordTmp.getX(), coordTmp.getY(), 0xFF000000);
         }
 
@@ -159,30 +168,22 @@ public class Vaisseau
     }
 
 
-
-
-    private void findBarycentre()
-    {
+    private void findBarycentre() {
         int sommeX = 0;
         int sommeY = 0;
 
-        for(Coordonnees cCoord : ensCoord)
-        {
+        for (Coordonnees cCoord : ensCoord) {
             sommeX += cCoord.getX();
             sommeY += cCoord.getY();
         }
 
-        this.xBarycentre = sommeX/ensCoord.size();
-        this.yBarycentre = sommeY/ensCoord.size();
+        this.xBarycentre = sommeX / ensCoord.size();
+        this.yBarycentre = sommeY / ensCoord.size();
 
     }
 
     public BufferedImage getImage() {
         return image;
-    }
-
-    public Coordonnees getCoords() {
-        return coords;
     }
 
     public int getxBarycentre() {
@@ -197,12 +198,8 @@ public class Vaisseau
         return IMAGE_PATH;
     }
 
-    public void setCoords(Coordonnees coords) {
-        instanceVaisseau.coords = coords;
-    }
-
     public void setImage(BufferedImage image) {
-        instanceVaisseau.image = image;
+        this.image = image;
     }
 
     public BufferedImage getMaskAlpha() {
@@ -210,7 +207,7 @@ public class Vaisseau
     }
 
     public void setMaskAlpha(BufferedImage maskAlpha) {
-        instanceVaisseau.maskAlpha = maskAlpha;
+        this.maskAlpha = maskAlpha;
     }
 
     public BufferedImage getContour() {
@@ -218,73 +215,17 @@ public class Vaisseau
     }
 
     public void setContour(BufferedImage contour) {
-        instanceVaisseau.contour = contour;
+        this.contour = contour;
     }
 
     public void setxBarycentre(int xBarycentre) {
-        instanceVaisseau.xBarycentre = xBarycentre;
+        this.xBarycentre = xBarycentre;
     }
 
     public void setyBarycentre(int yBarycentre) {
-        instanceVaisseau.yBarycentre = yBarycentre;
+        this.yBarycentre = yBarycentre;
     }
 
-    public double getAcceleration() {
-        return acceleration;
-    }
-
-    public void setAcceleration(double acceleration) {
-        instanceVaisseau.acceleration = acceleration;
-    }
-
-    public double getVitesseX() {
-        return vitesseX;
-    }
-
-    public void setVitesseX(double vitesseX) {
-        instanceVaisseau.vitesseX = vitesseX;
-    }
-
-    public double getVitesseY() {
-        return vitesseY;
-    }
-
-    public void setVitesseY(double vitesseY) {
-        instanceVaisseau.vitesseY = vitesseY;
-    }
-
-    public static double getVitesseMin() {
-        return VITESSE_MIN;
-    }
-
-    public static double getVitesseMax() {
-        return VITESSE_MAX;
-    }
-
-    public double getDeltaT() {
-        return deltaT;
-    }
-
-    public void setDeltaT(double deltaT) {
-        this.deltaT = deltaT;
-    }
-
-    public double getLastTime() {
-        return lastTime;
-    }
-
-    public void setLastTime(double lastTime) {
-        this.lastTime = lastTime;
-    }
-
-    public double getAngleRot() {
-        return angleRot;
-    }
-
-    public void setAngleRot(double angleRot) {
-        instanceVaisseau.angleAff = angleAff -( instanceVaisseau.angleRot - angleRot);
-        instanceVaisseau.angleRot = angleRot;
-    }
 
     public ArrayList<Coordonnees> getEnsCoord() {
         return ensCoord;
@@ -293,9 +234,35 @@ public class Vaisseau
     public void setEnsCoord(ArrayList<Coordonnees> ensCoord) {
         this.ensCoord = ensCoord;
     }
-    public double vitesse() { return  Math.sqrt(Math.pow(this.vitesseX,2)+Math.pow(this.vitesseY,2)); }
 
-    public double getAngleAff() {
-        return this.angleAff;
+    public int getPosX() {
+        return (int)posX;
+    }
+
+    public void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    public int getPosY() {
+        return (int)posY;
+    }
+
+    public void setPosY(int posY) {
+        this.posY = posY;
+    }
+
+    public double getAngleRot() {
+        return angleRot;
+    }
+
+    public void addAngleRot(double angleRot) {
+        this.angleRot += angleRot;
+    }
+    public double getAcceleration() {
+        return acceleration;
+    }
+
+    public void setAcceleration(double acceleration) {
+        this.acceleration = acceleration;
     }
 }

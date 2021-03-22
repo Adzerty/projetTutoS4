@@ -11,19 +11,47 @@ public class PanelUnivers extends JPanel implements KeyListener
     private Vaisseau vaisseau;
     private Coordonnees coods;
 
+    private double angleOffset = (3*Math.PI)/2;
+
     public PanelUnivers(int nbPlanetes)
     {
 
-        this.vaisseau = Vaisseau.getInstanceVaisseau();
+        this.vaisseau = Vaisseau.getInstance();
         this.vaisseau.setPanelUnivers(this);
 
         this.planetes = new ArrayList<>();
 
         for (int i=0; i<nbPlanetes; i++) planetes.add(new Planete());
-
         this.addKeyListener(this);
 
         this.vaisseau.startDeplacement();
+        this.checkCollisions();
+    }
+
+    public void checkCollisions()
+    {
+        Thread check = new Thread(() ->
+        {
+            while (true)
+            {
+                for(Planete p : planetes)
+                {
+                    
+                    Coordonnees coordPlanet = p.getCoord();
+
+                    for(Coordonnees coordContour : vaisseau.getEnsCoord())
+                    {
+                        double distance = Math.sqrt( Math.pow(coordContour.getX() - coordPlanet.getX(),2) + Math.pow(coordContour.getY() - coordPlanet.getY(),2));
+                        if(distance <= p.getTaille())
+                        {
+                            System.out.println("BOOM");
+                        }
+                    }
+
+                }
+            }
+        });
+        check.start();
     }
 
     public void setCoods(Coordonnees coods) {
@@ -38,13 +66,13 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
 
-        g2.rotate(vaisseau.getAngleAff(), vaisseau.getxBarycentre()+vaisseau.getCoords().getX(), vaisseau.getyBarycentre()+vaisseau.getCoords().getY());
-        g2.drawImage(vaisseau.getImage(), vaisseau.getCoords().getX(), vaisseau.getCoords().getY(),this);
+        g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
+        g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
 
     }
     public void rotateImage(double angle)
     {
-        vaisseau.setAngleRot(vaisseau.getAngleRot()+ Math.toRadians(angle));
+        vaisseau.addAngleRot(angle);
         repaint();
     }
 
@@ -57,16 +85,16 @@ public class PanelUnivers extends JPanel implements KeyListener
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode()==KeyEvent.VK_UP)
         {
-            if(vaisseau.getAcceleration()+0.001<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.005);
+            this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
         }
         else if (e.getKeyCode()==KeyEvent.VK_RIGHT)
         {
-            rotateImage(2.00);
+            rotateImage(5);
         }
 
         else if (e.getKeyCode()==KeyEvent.VK_LEFT)
         {
-            rotateImage(-2.00);
+            rotateImage(-5);
         }
     }
 
