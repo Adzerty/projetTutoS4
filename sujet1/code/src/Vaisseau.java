@@ -73,7 +73,7 @@ public class Vaisseau
                 instanceVaisseau.deltaT = System.currentTimeMillis() - instanceVaisseau.lastTime;
                 instanceVaisseau.lastTime = System.currentTimeMillis();
 
-                if (vitesse() < VITESSE_MAX) {
+                if (vitesse() < VITESSE_MAX && instanceVaisseau.acceleration != 0 ) {
                     instanceVaisseau.vitesseX = instanceVaisseau.vitesseX + (instanceVaisseau.acceleration * Math.cos(instanceVaisseau.angleRot));
                     instanceVaisseau.vitesseY = instanceVaisseau.vitesseY + (instanceVaisseau.acceleration * Math.sin(instanceVaisseau.angleRot));
                     //System.out.println("vitesse : " +instanceVaisseau.vitesse());
@@ -82,7 +82,21 @@ public class Vaisseau
                 instanceVaisseau.getCoords().setX((int) (instanceVaisseau.getCoords().getX() + (instanceVaisseau.vitesseX * instanceVaisseau.deltaT)));
                 instanceVaisseau.getCoords().setY((int) (instanceVaisseau.getCoords().getY() + (instanceVaisseau.vitesseY * instanceVaisseau.deltaT)));
 
-                if (instanceVaisseau.acceleration > 0) instanceVaisseau.acceleration -= 0.01;
+                if (instanceVaisseau.acceleration == 0 ) {
+                    if(vitesse() > getVitesseMin())
+                    {
+                        double vi =vitesse();
+                        instanceVaisseau.setVitesseX(instanceVaisseau.vitesseX * ( (vi - instanceVaisseau.deltaT *  0.0001) / vi));
+                        instanceVaisseau.setVitesseY(instanceVaisseau.vitesseY * ( (vi - instanceVaisseau.deltaT *  0.0001) / vi));
+                    }
+                    else
+                    {
+                        instanceVaisseau.setVitesseX(0);
+                        instanceVaisseau.setVitesseY(0);
+                    }
+
+                }
+                System.out.println(vitesse());
                 instanceVaisseau.panelUnivers.repaint();
 
                 try {
