@@ -25,6 +25,33 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.addKeyListener(this);
 
         this.vaisseau.startDeplacement();
+        this.checkCollisions();
+    }
+
+    public void checkCollisions()
+    {
+        Thread check = new Thread(() ->
+        {
+            while (true)
+            {
+                for(Planete p : planetes)
+                {
+                    
+                    Coordonnees coordPlanet = p.getCoord();
+
+                    for(Coordonnees coordContour : vaisseau.getEnsCoord())
+                    {
+                        double distance = Math.sqrt( Math.pow(coordContour.getX() - coordPlanet.getX(),2) + Math.pow(coordContour.getY() - coordPlanet.getY(),2));
+                        if(distance <= p.getTaille())
+                        {
+                            System.out.println("BOOM");
+                        }
+                    }
+
+                }
+            }
+        });
+        check.start();
     }
 
     public void setCoods(Coordonnees coods) {

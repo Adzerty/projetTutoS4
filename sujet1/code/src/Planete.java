@@ -3,8 +3,8 @@ public class Planete
     private Coordonnees coord;
     private int taille;
     private  static final  int TAILLE_FRAME = 500;
-    private static final int MIN = 5;
-    private static final int MAX = 25;
+    private static final int MIN = 10;
+    private static final int MAX = 50;
 
     public Planete()
     {

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Vaisseau {
     private static Vaisseau instance = new Vaisseau();
 
-    private static final String IMAGE_PATH = "/rocket-1.png";
+    private static final String IMAGE_PATH = "/rocket-2.png";
 
 
 
