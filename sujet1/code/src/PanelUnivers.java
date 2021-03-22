@@ -34,6 +34,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         {
             while (true)
             {
+                vaisseau.setEnsCoord(vaisseau.getMaskAlpha());
                 for(Planete p : planetes)
                 {
                     
@@ -42,6 +43,7 @@ public class PanelUnivers extends JPanel implements KeyListener
                     for(Coordonnees coordContour : vaisseau.getEnsCoord())
                     {
                         double distance = Math.sqrt( Math.pow(coordContour.getX() - coordPlanet.getX(),2) + Math.pow(coordContour.getY() - coordPlanet.getY(),2));
+                        System.out.println(distance);
                         if(distance <= p.getTaille())
                         {
                             System.out.println("BOOM");

@@ -130,6 +130,7 @@ public class Vaisseau {
     }
 
     private BufferedImage generateContour(BufferedImage mask) {
+        this.ensCoord = new ArrayList<>();
         BufferedImage imageToReturn = new BufferedImage(maskAlpha.getWidth(), maskAlpha.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         for (int i = 0; i < maskAlpha.getHeight(); i++) {
@@ -231,8 +232,8 @@ public class Vaisseau {
         return ensCoord;
     }
 
-    public void setEnsCoord(ArrayList<Coordonnees> ensCoord) {
-        this.ensCoord = ensCoord;
+    public void setEnsCoord(BufferedImage mask) {
+        this.generateContour(mask);
     }
 
     public int getPosX() {
