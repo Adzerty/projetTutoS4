@@ -18,7 +18,7 @@ public class PanelContour extends JPanel implements KeyListener
 
     private int xBarycentre;
     private int yBarycentre;
-    private double angle;
+    private double angleRot;
 
     private ArrayList<Coordonnees> ensCoord = new ArrayList<Coordonnees>();
 
@@ -52,9 +52,10 @@ public class PanelContour extends JPanel implements KeyListener
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D)g;
+        g2.rotate(angleRot, xBarycentre, yBarycentre);
         g2.drawImage(contour, 0, 0, this);
         g2.fillOval(xBarycentre,yBarycentre,10,10);
-        g2.rotate(angle, xBarycentre, yBarycentre);
+
     }
 
     private BufferedImage generateContour(BufferedImage mask)
@@ -80,6 +81,17 @@ public class PanelContour extends JPanel implements KeyListener
                             }catch(Exception e) {}
 
                         }
+                    }
+
+                }else
+                {
+                    if( j == maskAlpha.getWidth()-1         ||
+                            j == 0                         ||
+                            i == maskAlpha.getHeight()-1    ||
+                            i == 0)
+                    {
+                        Coordonnees coordTmp = new Coordonnees(j, i);
+                        ensCoord.add(coordTmp);
                     }
                 }
             }
@@ -114,8 +126,7 @@ public class PanelContour extends JPanel implements KeyListener
 
     public void rotateImage(double angle)
     {
-        this.angle += Math.toRadians(angle);
-        System.out.println(angle);
+        this.angleRot += Math.toRadians(angle);
         repaint();
     }
     @Override
