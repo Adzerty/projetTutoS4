@@ -67,7 +67,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         }
         else if (e.getKeyCode()==KeyEvent.VK_UP)
         {
-            if(this.vaisseau.getAcceleration()+0.001<Vaisseau.getVitesseMax()) this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
+            this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
         }
     }
 

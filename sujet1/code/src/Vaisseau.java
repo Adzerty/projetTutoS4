@@ -17,6 +17,7 @@ public class Vaisseau
     private int xBarycentre;
     private int yBarycentre;
     private double acceleration;
+    private double deceleration = 0.00001;
     private double vitesseX;
     private double vitesseY;
     private static final double VITESSE_MIN = 0.0001;
@@ -32,7 +33,8 @@ public class Vaisseau
 
     private Vaisseau()
     {
-        this.angleRot = Math.PI/2;
+        this.angleRot = 0;
+
         this.deltaT = 0;
         this.lastTime =0;
         this.vitesseX =0;
@@ -47,6 +49,7 @@ public class Vaisseau
         } catch (IOException ex) {
             System.out.println(image);
         }
+
         for(int i = 0; i<image.getHeight(); i++)
         {
             for(int j = 0; j<image.getWidth(); j++)
@@ -73,34 +76,40 @@ public class Vaisseau
                 instanceVaisseau.deltaT = System.currentTimeMillis() - instanceVaisseau.lastTime;
                 instanceVaisseau.lastTime = System.currentTimeMillis();
 
-                if (vitesse() < VITESSE_MAX && instanceVaisseau.acceleration != 0 ) {
+                if (vitesse() < VITESSE_MAX )
+                {
+                    //System.out.println(instanceVaisseau.angleRot);
                     instanceVaisseau.vitesseX = instanceVaisseau.vitesseX + (instanceVaisseau.acceleration * Math.cos(instanceVaisseau.angleRot));
                     instanceVaisseau.vitesseY = instanceVaisseau.vitesseY + (instanceVaisseau.acceleration * Math.sin(instanceVaisseau.angleRot));
-                    //System.out.println("vitesse : " +instanceVaisseau.vitesse());
-                }
-
-                instanceVaisseau.getCoords().setX((int) (instanceVaisseau.getCoords().getX() + (instanceVaisseau.vitesseX * instanceVaisseau.deltaT)));
-                instanceVaisseau.getCoords().setY((int) (instanceVaisseau.getCoords().getY() + (instanceVaisseau.vitesseY * instanceVaisseau.deltaT)));
-
-                if (instanceVaisseau.acceleration == 0 ) {
-                    if(vitesse() > getVitesseMin())
-                    {
-                        double vi =vitesse();
-                        instanceVaisseau.setVitesseX(instanceVaisseau.vitesseX * ( (vi - instanceVaisseau.deltaT *  0.0001) / vi));
-                        instanceVaisseau.setVitesseY(instanceVaisseau.vitesseY * ( (vi - instanceVaisseau.deltaT *  0.0001) / vi));
-                    }
-                    else
-                    {
-                        instanceVaisseau.setVitesseX(0);
-                        instanceVaisseau.setVitesseY(0);
-                    }
 
                 }
+
+
+                double vitesseFinal = vitesse() - (deltaT * deceleration);
+
+                if(vitesse() != 0)
+                {
+                    instanceVaisseau.vitesseX = instanceVaisseau.vitesseX * (vitesseFinal / vitesse());
+                    instanceVaisseau.vitesseY = instanceVaisseau.vitesseY * (vitesseFinal / vitesse());
+                }
+
+                if(vitesse() < VITESSE_MIN)
+                {
+                    instanceVaisseau.vitesseX = 0;
+                    instanceVaisseau.vitesseY = 0;
+                }
+
+                instanceVaisseau.getCoords().setX( (int) (instanceVaisseau.getCoords().getX() + (instanceVaisseau.vitesseX * instanceVaisseau.deltaT)));
+                instanceVaisseau.getCoords().setY( (int) (instanceVaisseau.getCoords().getY() + (instanceVaisseau.vitesseY * instanceVaisseau.deltaT)));
+
+
+
                 System.out.println(vitesse());
                 instanceVaisseau.panelUnivers.repaint();
 
+
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
