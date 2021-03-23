@@ -2,6 +2,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class Vaisseau {
@@ -9,6 +10,8 @@ public class Vaisseau {
 
     private static final String IMAGE_PATH = "/rocket-1.png";
     private static final String IMAGE_PROP_PATH = "/propeling2.png";
+
+    private Thread threadDep;
 
 
     private BufferedImage image;
@@ -82,7 +85,7 @@ public class Vaisseau {
 
     public void startDeplacement()
     {
-        Thread dep = new Thread(() ->
+        this.threadDep = new Thread(() ->
         {
             while (true)
             {
@@ -124,7 +127,12 @@ public class Vaisseau {
                 try {Thread.sleep(10);} catch(InterruptedException e){e.printStackTrace();}
             }
         });
-        dep.start();
+        this.threadDep.start();
+
+    }
+
+    public void stopDeplacement(){
+        this.threadDep.stop();
     }
 
     public static Vaisseau getInstance() {

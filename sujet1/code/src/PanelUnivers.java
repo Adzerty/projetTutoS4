@@ -3,8 +3,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.sleep;
 
 
 public class PanelUnivers extends JPanel implements KeyListener
@@ -12,6 +17,10 @@ public class PanelUnivers extends JPanel implements KeyListener
     private ArrayList<Planete> planetes;
     private Vaisseau vaisseau;
     private Coordonnees coods;
+    private boolean aTouche;
+    private boolean gameOver;
+
+    private BufferedImage explosion;
 
     private final int WIDTH = 500;
     private final int HEIGHT = 500;
@@ -41,7 +50,7 @@ public class PanelUnivers extends JPanel implements KeyListener
     {
         Thread check = new Thread(() ->
         {
-            while (true)
+            while (!this.gameOver)
             {
                 for(Planete p : planetes)
                 {
@@ -62,11 +71,13 @@ public class PanelUnivers extends JPanel implements KeyListener
 
                         xp = xpn + this.vaisseau.getPosX() + this.vaisseau.getxBarycentre();
                         yp = ypn + this.vaisseau.getPosY() + this.vaisseau.getyBarycentre();
+
                         //double distance = Math.sqrt( Math.pow(((this.vaisseau.getPosX()) + (coordContour.getX() * Math.cos(Math.toRadians(this.vaisseau.getAngleRot())))) - planX,2) +  Math.pow(((this.vaisseau.getPosY()) + (coordContour.getY() * Math.sin(Math.toRadians(this.vaisseau.getAngleRot())))) - planY,2));
 
                         double distance = Math.sqrt( Math.pow(planX - xp, 2) + Math.pow(planY - yp, 2) );
                         if(distance <= p.getTaille()/2)
                         {
+                            this.aTouche = true;
                             System.out.println("BOOM");
                         }
                     }
@@ -113,12 +124,22 @@ public class PanelUnivers extends JPanel implements KeyListener
         g2.setComposite(AlphaComposite.SrcOver.derive(vitesse));
         g2.drawImage(vaisseau.getPropeling(),vaisseau.getPosX(), vaisseau.getPosY(),this);
 
+        if (this.aTouche )
+        {
+
+            Image icon2 = new ImageIcon(Vaisseau.class.getResource("/explosion.gif")).getImage();
+            g2.drawImage(icon2,  this.vaisseau.getPosX() - 75,  this.vaisseau.getPosY()- 152, this);
+            this.vaisseau.stopDeplacement();
+            this.gameOver = true;
+        }
 
     }
     public void rotateImage(double angle)
     {
-        vaisseau.addAngleRot(angle);
-        repaint();
+        if (!this.gameOver){
+            vaisseau.addAngleRot(angle);
+            repaint();
+        }
     }
 
     @Override
