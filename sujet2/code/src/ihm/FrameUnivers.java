@@ -27,6 +27,7 @@ public class FrameUnivers extends JFrame
         //this.setLocation(50,50);
         this.setLocationRelativeTo(null);
         this.setSize(WIDTH,HEIGHT);
+        this.setResizable(false);
 
         this.setVisible(true);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
