@@ -169,8 +169,10 @@ public class PanelUnivers extends JPanel implements KeyListener
             Image icon2 = new ImageIcon(Vaisseau.class.getResource("/explosion.gif")).getImage();
             g2.drawImage(icon2,  this.vaisseau.getPosX() - 75,  this.vaisseau.getPosY()- 152, this);
             this.vaisseau.stopDeplacement();
+
             for(Planete p : planetes)
                 p.stopDeplacement();
+            
             this.gameOver = true;
         }
 
