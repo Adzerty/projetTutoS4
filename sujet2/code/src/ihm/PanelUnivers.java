@@ -1,8 +1,10 @@
 package ihm;
 
+import jdk.swing.interop.SwingInterOpUtils;
 import metier.Coordonnees;
 import metier.Planete;
 import metier.Vaisseau;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static java.lang.Thread.sleep;
 
@@ -21,6 +24,10 @@ public class PanelUnivers extends JPanel implements KeyListener
     private Coordonnees coods;
     private boolean aTouche;
     private boolean gameOver;
+    private int posXpandora;
+    private int posYpandora;
+
+
 
     private BufferedImage explosion;
 
@@ -41,12 +48,22 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.vaisseau = Vaisseau.getInstance();
         this.vaisseau.setPanelUnivers(this);
 
+
+
         System.out.println(this.getInsets().top);
 
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=0; i<nbPlanetes; i++) planetes.add(new Planete());
+        for (int i=0; i<(nbPlanetes+1); i++){
+            if (i == 0){
+                planetes.add(new Planete(true));
+            }
+            else {
+                planetes.add(new Planete(false));
+            }
+
+        }
         this.addKeyListener(this);
 
         //On commence le thread de deplacement du vaisseau
@@ -85,14 +102,24 @@ public class PanelUnivers extends JPanel implements KeyListener
                         //On calcul la distance entre la planete et chaque pixel du vaisseau
                         double distance = Math.sqrt( Math.pow(planX - xp, 2) + Math.pow(planY - yp, 2) );
 
+
                         if(distance <= p.getTaille()/2)//Si le vaisseau touche on met "aTouche"
                         {
-                            this.aTouche = true;
+                            if (p.estPandora())
+                            {
+                                System.out.println("C'EST GAGNE");
+                                this.gameOver = true;
+                                this.vaisseau.stopDeplacement();
+                            }else {
+                                this.aTouche = true;
+                            }
+
                         }
                     }
 
                 }
             }
+
         });
         check.start();
     }
@@ -107,8 +134,19 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         Graphics2D g2 = (Graphics2D)g;
 
+
+        g2.setColor(Color.BLACK);
+
         //Pour chaque planetes on cree un rond
-        for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
+        for (Planete p : planetes) {
+            if (p.estPandora()){
+                g2.setColor(Color.BLUE);
+                g2.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
+                g2.setColor(Color.BLACK);
+            }else {
+                g2.fillOval(p.getCoord().getX(), p.getCoord().getY(), p.getTaille(), p.getTaille());
+            }
+        }
 
         //On tourne le vaisseau selon l'angle
         g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
@@ -128,6 +166,7 @@ public class PanelUnivers extends JPanel implements KeyListener
 
             //On dessine le vaisseau
         g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+
 
         if (this.aTouche ) //Si le vaisseau touche
         {
