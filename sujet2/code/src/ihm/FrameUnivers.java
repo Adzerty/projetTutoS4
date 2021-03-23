@@ -1,7 +1,10 @@
 package ihm;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class FrameUnivers extends JFrame
 {
@@ -28,4 +31,5 @@ public class FrameUnivers extends JFrame
         this.setVisible(true);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+
 }

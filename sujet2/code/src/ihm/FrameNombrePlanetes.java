@@ -1,6 +1,6 @@
 package ihm;
 
-import metier.Univers;
+import metier.*;
 
 import javax.swing.*;
 import java.awt.*;
