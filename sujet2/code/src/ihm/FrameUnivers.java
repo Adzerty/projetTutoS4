@@ -1,15 +1,18 @@
 package ihm;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class FrameUnivers extends JFrame
 {
     private int nbPlanete;
     private PanelUnivers panelUniv;
 
-    public static final int WIDTH = 1000;
-    public static final int HEIGHT = 1000;
+    public static final int WIDTH = 500;
+    public static final int HEIGHT = 500;
     public FrameUnivers(int nbPlanete)
     {
        
@@ -28,4 +31,5 @@ public class FrameUnivers extends JFrame
         this.setVisible(true);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+
 }

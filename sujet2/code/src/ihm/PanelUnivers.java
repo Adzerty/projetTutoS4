@@ -1,17 +1,15 @@
 package ihm;
 
-import metier.Coordonnees;
-import metier.Planete;
-import metier.Vaisseau;
+import metier.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
-
-import static java.lang.Thread.sleep;
 
 
 public class PanelUnivers extends JPanel implements KeyListener
@@ -110,6 +108,14 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         Graphics2D g2 = (Graphics2D)g;
 
+        try {
+            BufferedImage imgFond = ImageIO.read(PanelUnivers.class.getResourceAsStream("/fond.jpg"));
+            g.drawImage(imgFond, 0, 0,FrameUnivers.WIDTH,FrameUnivers.HEIGHT, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         //Pour chaque planetes on cree un rond
         for (Planete p : planetes)
         {
@@ -125,7 +131,15 @@ public class PanelUnivers extends JPanel implements KeyListener
             if(p.getPosY()>= height + p.getTaille())
                 p.setPosY(0);
 
-            g.fillOval((int) p.getPosX(),(int) p.getPosY(),p.getTaille(),p.getTaille());
+            try {
+                BufferedImage imgPlanete = ImageIO.read(PanelUnivers.class.getResourceAsStream("/planete/p"+p.getImgP()+".png"));
+                g.drawImage(imgPlanete, (int) p.getPosX(),(int) p.getPosY(),p.getTaille(),p.getTaille(), this);
+
+
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+            //g.fillOval((int) p.getPosX(),(int) p.getPosY(),p.getTaille(),p.getTaille());
         }
 
         //On tourne le vaisseau selon l'angle

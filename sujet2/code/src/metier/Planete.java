@@ -1,7 +1,7 @@
 package metier;
 
-import ihm.FrameUnivers;
-import ihm.PanelUnivers;
+import ihm.*;
+
 
 import java.util.Random;
 
@@ -9,6 +9,7 @@ public class Planete
 {
     private Coordonnees coord;
     private int taille;
+    private int imgP;
     private  static final  int TAILLE_FRAME = FrameUnivers.HEIGHT;
     private static final int MIN = 25;
     private static final int MAX = 75;
@@ -48,6 +49,7 @@ public class Planete
     {
         this.panelUnivers = p;
 
+        this.imgP = (int)(Math.random()*5+1);
         Random r = new Random();
         int low = -180;
         int high = 180;
@@ -161,5 +163,9 @@ public class Planete
 
     public void setPosY(double posY) {
         this.posY = posY;
+    }
+
+    public int getImgP() {
+        return imgP;
     }
 }
