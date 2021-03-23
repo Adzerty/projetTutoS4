@@ -25,33 +25,8 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.addKeyListener(this);
 
         this.vaisseau.startDeplacement();
-        this.checkCollisions();
     }
 
-    public void checkCollisions()
-    {
-        Thread check = new Thread(() ->
-        {
-            while (true)
-            {
-                for(Planete p : planetes)
-                {
-                    Coordonnees coordPlanet = p.getCoord();
-                    for(Coordonnees coordContour : this.vaisseau.getEnsCoord())
-                    {
-                        double distance = Math.sqrt( Math.pow( coordPlanet.getX() - coordContour.getX()+ (this.vaisseau.getPosX()* Math.cos(Math.toRadians(this.vaisseau.getAngleRot()))) ,2) +  Math.pow( coordPlanet.getY() - coordContour.getY() + (this.getY() * Math.sin(Math.toRadians(this.vaisseau.getAngleRot()))),2));
-
-                        if(distance <= p.getTaille())
-                        {
-                            System.out.println("BOOM");
-                        }
-                    }
-
-                }
-            }
-        });
-        check.start();
-    }
 
     public void setCoods(Coordonnees coods) {
         this.coods = coods;
@@ -59,14 +34,24 @@ public class PanelUnivers extends JPanel implements KeyListener
 
     protected void paintComponent(Graphics g)
     {
+
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D)g;
 
-        for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
+        for (Planete p : planetes) g.fillOval((int)p.getCoord().getX(),(int)p.getCoord().getY(),p.getTaille(),p.getTaille());
 
-        g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
-        g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+        //g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
+        //g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+
+        g2.setColor(Color.RED);
+        for(Coordonnees c : this.vaisseau.getEnsCoord())
+        {
+            g2.drawRect((int) (c.getX()), (int)(c.getY()),1,1 );
+        }
+        g2.setColor(Color.YELLOW);
+        g2.fillRect((int)vaisseau.getxBarycentre()+ vaisseau.getPosX(), (int)vaisseau.getyBarycentre()+ vaisseau.getPosY(), 5,5);
+        g2.dispose();
 
     }
     public void rotateImage(double angle)
@@ -86,6 +71,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         {
             this.vaisseau.setAcceleration(this.vaisseau.getAcceleration()+0.001);
         }
+
         else if (e.getKeyCode()==KeyEvent.VK_RIGHT)
         {
             rotateImage(5);
@@ -105,5 +91,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         }
     }
 
-
+    public ArrayList<Planete> getPlanetes() {
+        return planetes;
+    }
 }

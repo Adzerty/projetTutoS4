@@ -9,19 +9,23 @@ public class Vaisseau {
 
     private static final String IMAGE_PATH = "/rocket-2.png";
 
+    private final int POS_X_INIT = 0;
+    private final int POS_Y_INIT = 0;
 
 
     private BufferedImage image;
     private BufferedImage maskAlpha;
     private BufferedImage contour;
 
-    private int xBarycentre;
-    private int yBarycentre;
+    private double xBarycentre;
+    private double yBarycentre;
 
     //ATTRIBUTS POUR LE DEPLACEMENT DU VAISSEAU
     // ----------------------------------------
     //rotation
     private double angleRot = 0;
+    private double angleRotContour = -1;
+    private double angleOffset = (3*Math.PI)/2;
 
     //position
     private double posX;
@@ -49,22 +53,26 @@ public class Vaisseau {
 
     private Vaisseau()
     {
-        this.posX = 250;
-        this.posY = 250;
+        this.posX = POS_X_INIT;
+        this.posY = POS_Y_INIT;
 
         try {
             image = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
-            this.maskAlpha = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
-
         } catch (IOException ex) {
             System.out.println(image);
         }
 
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                Color c = new Color(image.getRGB(j, i), true);
-                if (c.getAlpha() > 0) {
-                    maskAlpha.setRGB(j, i, 0xFF000000);
+        //On cree le masque alpha
+        this.maskAlpha = new BufferedImage(image.getWidth(), image.getHeight(),BufferedImage.TYPE_INT_ARGB);
+
+        for(int i = 0; i<image.getHeight(); i++)
+        {
+            for(int j = 0; j<image.getWidth(); j++)
+            {
+                Color c = new Color(image.getRGB(j,i), true);
+                if(c.getAlpha() > 0)
+                {
+                    maskAlpha.setRGB(j,i,0xFF000000);
                 }
             }
         }
@@ -101,6 +109,25 @@ public class Vaisseau {
                 v.posX = v.posX + (v.vitesse.getvX() * deltaT);
                 v.posY = v.posY + (v.vitesse.getvY() * deltaT);
 
+                //ensCoord.clear();
+                findBarycentre();
+                for(Coordonnees c : v.ensCoord)
+                {
+                    c.setX(c.getX() + (v.vitesse.getvX() * deltaT));
+                    c.setY(c.getY() + (v.vitesse.getvY() * deltaT));
+
+
+                    if(angleRotContour != angleRot)
+                    {
+                        this.rotateCoord(c, v.angleRot);
+                    }
+                }
+
+                if(angleRotContour != angleRot)
+                    angleRotContour = angleRot;
+
+
+
                 Vecteur vitInit = new Vecteur(v.vitesse.getvX(), v.vitesse.getvY());
                 double vitFinal = vitInit.getNorme() - (deltaT * decelerarion);
 
@@ -116,6 +143,24 @@ public class Vaisseau {
                     v.vitesse.setvY(0);
                 }
 
+                Planete pTmp = v.panelUnivers.getPlanetes().get(0);
+                Coordonnees cTmp = v.ensCoord.get(0);
+
+                /*
+                for(Planete p : v.panelUnivers.getPlanetes())
+                {
+                    Coordonnees coordPlanet = p.getCoord();
+                    for(Coordonnees coordContour : v.ensCoord)
+                    {
+                        double distance = Math.sqrt( Math.pow(coordContour.getX() - coordPlanet.getX() ,2) + Math.pow(coordContour.getY() - coordPlanet.getY(),2)  );
+                        if(distance <= p.getTaille()/2)
+                        {
+                            System.out.println("BOOM");
+                        }
+                    }
+
+                }*/
+                //System.out.println(Math.sqrt( Math.pow(cTmp.getX() - pTmp.getCoord().getX(),2) +  Math.pow(cTmp.getY() - pTmp.getCoord().getY(),2)));
                 v.panelUnivers.repaint();
 
                 v.tpsFin = System.currentTimeMillis();
@@ -125,35 +170,51 @@ public class Vaisseau {
         dep.start();
     }
 
+    public static BufferedImage copyImage(BufferedImage source){
+        BufferedImage b = new BufferedImage(source.getWidth(), source.getHeight(), source.getType());
+        Graphics g = b.getGraphics();
+        g.drawImage(source, 0, 0, null);
+        g.dispose();
+        return b;
+    }
+
     public static Vaisseau getInstance() {
         return instance;
     }
 
 
-    private BufferedImage generateContour(BufferedImage mask) {
-        BufferedImage imageToReturn = new BufferedImage(maskAlpha.getWidth(), maskAlpha.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    private BufferedImage generateContour(BufferedImage mask)
+    {
+        BufferedImage imageToReturn = new BufferedImage(mask.getWidth(), mask.getHeight(),BufferedImage.TYPE_INT_ARGB);
 
-        for (int i = 0; i < maskAlpha.getHeight(); i++) {
-            for (int j = 0; j < maskAlpha.getWidth(); j++) {
-                if (image.getRGB(j, i) != 0xFF000000) {
-                    for (int y = -1; y < 2; y++) {
-                        for (int x = -1; x < 2; x++) {
-                            try {
-                                if (maskAlpha.getRGB(j + x, i + y) == 0xFF000000) {
-                                    Coordonnees coordTmp = new Coordonnees(j + x, i + y);
+        for(int i = 0; i<mask.getHeight(); i++)
+        {
+            for (int j = 0; j < mask.getWidth(); j++)
+            {
+                if(mask.getRGB(j,i) != 0xFF000000)
+                {
+                    for(int y = -1; y<2; y++)
+                    {
+                        for(int x = -1; x<2; x++)
+                        {
+                            try{
+                                if(mask.getRGB(j+x, i+y) == 0xFF000000)
+                                {
+                                    Coordonnees coordTmp = new Coordonnees(j+x, i+y);
                                     ensCoord.add(coordTmp);
                                 }
-                            } catch (Exception e) {
-                            }
+                            }catch(Exception e) {}
 
                         }
                     }
 
-                } else {
-                    if (j == maskAlpha.getWidth() - 1 ||
-                            j == 0 ||
-                            i == maskAlpha.getHeight() - 1 ||
-                            i == 0) {
+                }else
+                {
+                    if( j == mask.getWidth()-1         ||
+                            j == 0                         ||
+                            i == mask.getHeight()-1    ||
+                            i == 0)
+                    {
                         Coordonnees coordTmp = new Coordonnees(j, i);
                         ensCoord.add(coordTmp);
                     }
@@ -161,8 +222,9 @@ public class Vaisseau {
             }
         }
 
-        for (Coordonnees coordTmp : ensCoord) {
-            imageToReturn.setRGB(coordTmp.getX(), coordTmp.getY(), 0xFF000000);
+        for(Coordonnees coordTmp : ensCoord)
+        {
+            imageToReturn.setRGB((int)coordTmp.getX(), (int)coordTmp.getY(), 0xFF000000);
         }
 
         return imageToReturn;
@@ -170,8 +232,8 @@ public class Vaisseau {
 
 
     private void findBarycentre() {
-        int sommeX = 0;
-        int sommeY = 0;
+        double sommeX = 0;
+        double sommeY = 0;
 
         for (Coordonnees cCoord : ensCoord) {
             sommeX += cCoord.getX();
@@ -183,15 +245,41 @@ public class Vaisseau {
 
     }
 
+    private void rotateCoord(Coordonnees c, double angle)
+    {
+
+        double realAngle = Math.toRadians(angle)+angleOffset;
+        System.out.println(realAngle);
+
+        //On translate
+        double x = c.getX();
+        double y = c.getY();
+
+        double xPrime = x - (xBarycentre);
+        double yPrime = y - (yBarycentre);
+
+
+        //On rotate
+        double xSeconde = ( xPrime * Math.cos(realAngle) ) - ( yPrime * Math.sin(realAngle) );
+        double ySeconde = ( yPrime * Math.cos(realAngle) ) + ( xPrime * Math.sin(realAngle) );
+
+        //On remet
+        double xMinute = xSeconde + (xBarycentre);
+        double yMinute = ySeconde + (yBarycentre);
+
+        c.setX(xMinute);
+        c.setY(yMinute);
+    }
+
     public BufferedImage getImage() {
         return image;
     }
 
-    public int getxBarycentre() {
+    public double getxBarycentre() {
         return xBarycentre;
     }
 
-    public int getyBarycentre() {
+    public double getyBarycentre() {
         return yBarycentre;
     }
 
