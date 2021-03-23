@@ -8,7 +8,7 @@ public class FrameUnivers extends JFrame
 
     public FrameUnivers(int nbPlanete)
     {
-        this.setUndecorated(true);
+       
         this.nbPlanete = nbPlanete;
         this.panelUniv = new PanelUnivers(nbPlanete);
 
