@@ -7,13 +7,14 @@ import java.util.ArrayList;
 public class Vaisseau {
     private static Vaisseau instance = new Vaisseau();
 
-    private static final String IMAGE_PATH = "/rocket-2.png";
-
+    private static final String IMAGE_PATH = "/rocket-1.png";
+    private static final String IMAGE_PROP_PATH = "/rocket-1-propeling.png";
 
 
     private BufferedImage image;
     private BufferedImage maskAlpha;
     private BufferedImage contour;
+    private BufferedImage propeling;
 
     private int xBarycentre;
     private int yBarycentre;
@@ -55,6 +56,7 @@ public class Vaisseau {
         try {
             image = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
             this.maskAlpha = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PATH));
+            this.propeling = ImageIO.read(Vaisseau.class.getResourceAsStream(IMAGE_PROP_PATH));
 
         } catch (IOException ex) {
             System.out.println(image);
@@ -266,5 +268,13 @@ public class Vaisseau {
 
     public void setAcceleration(double acceleration) {
         this.acceleration = acceleration;
+    }
+
+    public BufferedImage getPropeling() {
+        return propeling;
+    }
+
+    public Vecteur getVitesse() {
+        return vitesse;
     }
 }
