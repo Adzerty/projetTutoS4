@@ -83,24 +83,9 @@ public class PanelUnivers extends JPanel implements KeyListener
         Graphics2D g2 = (Graphics2D)g;
 
         for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
-        for( Coordonnees c : this.vaisseau.getEnsCoord()) {
-            double sin = Math.sin(Math.toRadians(vaisseau.getAngleRot())-Math.PI/2);
-            double cos = Math.cos(Math.toRadians(vaisseau.getAngleRot())-Math.PI/2);
-
-            double xp = c.getX()-this.vaisseau.getxBarycentre();
-            double yp = c.getY()-this.vaisseau.getyBarycentre();
-
-            double xpn = xp * cos - yp * sin;
-            double ypn = xp * sin + yp * cos;
-
-            xp = xpn + this.vaisseau.getPosX() + this.vaisseau.getxBarycentre();
-            yp = ypn + this.vaisseau.getPosY() + this.vaisseau.getyBarycentre();
-
-            g.fillOval((int)Math.round(xp), (int)Math.round(yp),2,2);
-        }
-
-        //g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
-        //g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+    
+        g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
+        g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
 
     }
     public void rotateImage(double angle)
