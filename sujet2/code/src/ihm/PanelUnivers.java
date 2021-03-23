@@ -46,7 +46,10 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=0; i<nbPlanetes; i++) planetes.add(new Planete());
+        for (int i=0; i<nbPlanetes; i++) {
+            planetes.add(new Planete(this));
+            planetes.get(i).startDeplacementPlanete();
+        }
         this.addKeyListener(this);
 
         //On commence le thread de deplacement du vaisseau
@@ -67,8 +70,8 @@ public class PanelUnivers extends JPanel implements KeyListener
                     Coordonnees coordPlanet = p.getCoord();
                     for(Coordonnees c : this.vaisseau.getEnsCoord()) //On calcul la position du contour du vaisseau
                     {
-                        double planX = p.getCoord().getX() + p.getTaille()/2;
-                        double planY = p.getCoord().getY() + p.getTaille()/2;
+                        double planX = p.getPosX()+ p.getTaille()/2;
+                        double planY = p.getPosY() + p.getTaille()/2;
 
                         double sin = Math.sin(Math.toRadians(vaisseau.getAngleRot())-Math.PI/2);
                         double cos = Math.cos(Math.toRadians(vaisseau.getAngleRot())-Math.PI/2);
@@ -108,7 +111,22 @@ public class PanelUnivers extends JPanel implements KeyListener
         Graphics2D g2 = (Graphics2D)g;
 
         //Pour chaque planetes on cree un rond
-        for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
+        for (Planete p : planetes)
+        {
+            if(p.getPosX() < 0 - p.getTaille())
+                p.setPosX(width);
+            else
+            if(p.getPosX()>= width + p.getTaille())
+                p.setPosX(0);
+
+            if(p.getPosY() < 0 - p.getTaille())
+                p.setPosY(height);
+            else
+            if(p.getPosY()>= height + p.getTaille())
+                p.setPosY(0);
+
+            g.fillOval((int) p.getPosX(),(int) p.getPosY(),p.getTaille(),p.getTaille());
+        }
 
         //On tourne le vaisseau selon l'angle
         g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
@@ -125,6 +143,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         else
             if(vaisseau.getPosY()>= height + vaisseau.getImage().getHeight())
                 vaisseau.setPosY(0);
+
 
             //On dessine le vaisseau
         g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
