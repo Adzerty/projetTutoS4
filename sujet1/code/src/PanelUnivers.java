@@ -1,7 +1,9 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -86,6 +88,13 @@ public class PanelUnivers extends JPanel implements KeyListener
     
         g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
         g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+
+        float vitesse = (float) vaisseau.getVitesse().getNorme()*10;
+        if(vitesse>1)vitesse=1;
+
+        g2.setComposite(AlphaComposite.SrcOver.derive(vitesse));
+        g2.drawImage(vaisseau.getPropeling(),vaisseau.getPosX(), vaisseau.getPosY(),this);
+
 
     }
     public void rotateImage(double angle)
