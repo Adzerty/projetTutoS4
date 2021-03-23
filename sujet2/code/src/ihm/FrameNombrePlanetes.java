@@ -16,8 +16,11 @@ public class FrameNombrePlanetes extends JFrame implements ActionListener
 
     public FrameNombrePlanetes(Univers univ)
     {
-        this.univ = univ;
+        this.setTitle("Sujet 1 - Equipe 1");;
+        this.setLocation(500,500);
+        this.setSize(200,200);
 
+        this.univ = univ;
         this.setLayout(new GridLayout(3,1));
 
         this.valider = new JButton("valider");
@@ -29,9 +32,7 @@ public class FrameNombrePlanetes extends JFrame implements ActionListener
         this.add(this.valider);
         this.valider.addActionListener(this);
 
-        this.setTitle("Sujet 1 - Equipe 1");;
-        this.setLocation(500,500);
-        this.setSize(200,200);
+
         this.setVisible(true);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
