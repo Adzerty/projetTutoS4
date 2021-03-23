@@ -21,7 +21,7 @@ public class Vaisseau {
     //ATTRIBUTS POUR LE DEPLACEMENT DU VAISSEAU
     // ----------------------------------------
     //rotation
-    private double angleRot = 0;
+    private double angleRot = Math.PI/2;
 
     //position
     private double posX;
