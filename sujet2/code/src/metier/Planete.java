@@ -149,6 +149,12 @@ public class Planete
 
     }
 
+
+    public void stopDeplacement()
+    {
+        this.threadDep.stop();
+    }
+
     public double getPosX() {
         return posX;
     }

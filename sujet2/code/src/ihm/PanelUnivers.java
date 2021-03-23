@@ -39,7 +39,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.vaisseau = Vaisseau.getInstance();
         this.vaisseau.setPanelUnivers(this);
 
-        System.out.println(this.getInsets().top);
+        this.setBackground(new Color(4,30,60));
 
         this.planetes = new ArrayList<>();
 
@@ -108,12 +108,13 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         Graphics2D g2 = (Graphics2D)g;
 
-        try {
+      /*  try {
             BufferedImage imgFond = ImageIO.read(PanelUnivers.class.getResourceAsStream("/fond.jpg"));
             g.drawImage(imgFond, 0, 0,FrameUnivers.WIDTH,FrameUnivers.HEIGHT, this);
         } catch (IOException e) {
             e.printStackTrace();
         }
+*/
 
 
         //Pour chaque planetes on cree un rond
@@ -168,6 +169,8 @@ public class PanelUnivers extends JPanel implements KeyListener
             Image icon2 = new ImageIcon(Vaisseau.class.getResource("/explosion.gif")).getImage();
             g2.drawImage(icon2,  this.vaisseau.getPosX() - 75,  this.vaisseau.getPosY()- 152, this);
             this.vaisseau.stopDeplacement();
+            for(Planete p : planetes)
+                p.stopDeplacement();
             this.gameOver = true;
         }
 
