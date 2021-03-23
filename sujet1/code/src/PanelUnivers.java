@@ -11,6 +11,9 @@ public class PanelUnivers extends JPanel implements KeyListener
     private Vaisseau vaisseau;
     private Coordonnees coods;
 
+    private final int WIDTH = 500;
+    private final int HEIGHT = 500;
+
 
 
     private double angleOffset = (3*Math.PI)/2;
@@ -83,8 +86,23 @@ public class PanelUnivers extends JPanel implements KeyListener
         Graphics2D g2 = (Graphics2D)g;
 
         for (Planete p : planetes) g.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
-    
+
+
+
         g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
+
+        if(vaisseau.getPosX() < 0)
+            vaisseau.setPosX(WIDTH);
+        else
+            if(vaisseau.getPosX()>= WIDTH)
+                vaisseau.setPosX(0);
+
+        if(vaisseau.getPosY() < 0)
+            vaisseau.setPosY(HEIGHT);
+        else
+            if(vaisseau.getPosY()>= HEIGHT)
+                vaisseau.setPosY(0);
+
         g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
 
     }
