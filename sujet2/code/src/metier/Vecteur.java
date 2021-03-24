@@ -10,6 +10,16 @@ public class Vecteur
         this.vY = vY;
     }
 
+    public Vecteur multiplication(double k)
+    {
+        return new Vecteur(k*vX, k*vY);
+    }
+
+    public Vecteur addition(Vecteur v2)
+    {
+        return new Vecteur(vX + v2.vX, vY + v2.vY);
+    }
+
     public double getvX() {
         return vX;
     }

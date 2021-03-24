@@ -3,6 +3,7 @@ package metier;
 import ihm.*;
 
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Planete
@@ -20,6 +21,7 @@ public class Planete
     -----*/
 
     private Thread threadDep;
+    private Thread threadCol;
 
     //rotation
     public double angleRotation;
@@ -32,6 +34,7 @@ public class Planete
     private final double MAX_VITESSE = 0.20;
     private final double MIN_VITESSE = 0.01;
     private Vecteur vitesse;
+    double  randVitesse;
 
     //acceleration
     private double acceleration = 0;
@@ -45,6 +48,8 @@ public class Planete
     /*--------------------------------*/
 
     private PanelUnivers panelUnivers;
+
+    public boolean debug;
 
     public Planete(boolean pandora, PanelUnivers p)
     {
@@ -123,14 +128,8 @@ public class Planete
                 tpsDebut = System.currentTimeMillis();
                 deltaT = tpsDebut - tpsFin;
 
-                if(vitesse.calculNormeAvecDeuxValeurs( //On verifie que la vitesse ne depassera pas la vitesse max
-                        vitesse.getvX() + acceleration * Math.cos(Math.toRadians(angleRotation)),
-                        vitesse.getvY()) + acceleration * Math.sin(Math.toRadians(angleRotation))
-                        < MAX_VITESSE )
-                {
-                    vitesse.setvX(vitesse.getvX() + acceleration * Math.cos(Math.toRadians(angleRotation)));
-                    vitesse.setvY(vitesse.getvY() + acceleration * Math.sin(Math.toRadians(angleRotation)));
-                }
+                vitesse.setvX(vitesse.getvX() + acceleration * Math.cos(Math.toRadians(angleRotation)));
+                vitesse.setvY(vitesse.getvY() + acceleration * Math.sin(Math.toRadians(angleRotation)));
 
                 //On calcul la nouvelle position
                 posX = posX + (vitesse.getvX() * deltaT);
@@ -156,6 +155,7 @@ public class Planete
 
                 //System.out.println((int)posX + " : " + (int)posY);
                 //On repeint la toile
+
                 panelUnivers.repaint();
 
                 tpsFin = System.currentTimeMillis();
@@ -170,6 +170,60 @@ public class Planete
     public void stopDeplacement()
     {
         this.threadDep.stop();
+    }
+
+    public void checkCollisionsPlanetes()
+    {
+        this.threadCol = new Thread(() ->
+        {
+            System.out.println(this.angleRotation);
+            while (true)
+            {
+
+                ArrayList<Planete> ensPlanete = panelUnivers.getPlanetes();
+
+                for(Planete p : ensPlanete)
+                {
+                    if(p != this && !p.estPandora())
+                    {
+                        //On calcul la distance entre la planete et chaque pixel du vaisseau
+                        double distance = Math.sqrt( Math.pow(posX - p.posX, 2) + Math.pow(posY - p.posY, 2) );
+
+                        if(distance <= ((p.getTaille()/2) + (getTaille()/2)))
+                        {
+                            System.out.println(this.angleRotation);
+                            //Deux planetes se touchent
+                            //variable de la planete "this" au moment du choc
+                            double mPlanete =  Math.PI * (Math.pow(getTaille()/2,2));
+                            Vecteur vPlanete =  this.vitesse;
+                            Vecteur pPlanete =  this.vitesse.multiplication(mPlanete);
+
+
+                            //variable de la planete p (choquee) au moment du choc
+                            double mAutrePlanete =  Math.PI * (Math.pow(p.getTaille()/2,2));
+                            Vecteur vAutrePlanete =  p.vitesse;
+                            Vecteur pAutrePlanete =  vAutrePlanete.multiplication(mAutrePlanete);
+
+                            //Energie cinetique du choc
+                            double Ec = ( Math.pow(pPlanete.getvX(),2) + Math.pow(pPlanete.getvY(),2) ) / 2 * mPlanete  + (  Math.pow(pAutrePlanete.getvX(),2) + Math.pow(pAutrePlanete.getvY(),2)  ) / 2 * mAutrePlanete;
+
+
+                            //Calcul des variables après le choc
+                            double pPrimeX = (mPlanete*pPlanete.getvX() - Math.pow(((mPlanete+mAutrePlanete)*(2*mPlanete*mAutrePlanete*Ec - mAutrePlanete*Math.pow(pPlanete.getvY(),2) - mPlanete*Math.pow(pAutrePlanete.getvY(),2) - mPlanete*mAutrePlanete*Math.pow(pPlanete.getvX(),2))),1/2))
+                                                /mPlanete+mAutrePlanete;
+
+                            double newAngle = pPlanete.getvY() / pPrimeX;
+
+                            angleRotation = Math.toDegrees(Math.atan(newAngle));
+
+
+                        }
+                    }
+
+                }
+            }
+        });
+        this.threadCol.start();
     }
 
     public Thread getThreadDep() {
