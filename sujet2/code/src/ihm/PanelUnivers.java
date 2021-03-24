@@ -22,12 +22,12 @@ public class PanelUnivers extends JPanel implements KeyListener
     private ArrayList<Planete> planetes;
     private Vaisseau vaisseau;
     private Coordonnees coods;
+
     private boolean aTouche;
     private boolean gameOver;
+
     private int posXpandora;
     private int posYpandora;
-
-
 
     private BufferedImage explosion;
 
@@ -106,7 +106,6 @@ public class PanelUnivers extends JPanel implements KeyListener
                         {
                             if (p.estPandora())
                             {
-                                System.out.println("C'EST GAGNE");
                                 this.gameOver = true;
                                 this.vaisseau.stopDeplacement();
                             }else {
@@ -201,6 +200,20 @@ public class PanelUnivers extends JPanel implements KeyListener
 
                 g2.setComposite(AlphaComposite.SrcOver.derive(vitesse));
                 g2.drawImage(vaisseau.getPropeling(), vaisseau.getPosX(), vaisseau.getPosY(), this);
+            }
+            else
+            {
+                if(! aTouche)
+                {
+                    Image icon2 = new ImageIcon(Vaisseau.class.getResource("/confetti.gif")).getImage();
+                    g2.drawImage(icon2, this.vaisseau.getPosX() - 120, this.vaisseau.getPosY() - 152, this);
+
+                    for (Planete p1 : planetes)
+                    {
+                        if(p1.getThreadDep() != null)
+                            p1.stopDeplacement();
+                    }
+                }
             }
 
     }

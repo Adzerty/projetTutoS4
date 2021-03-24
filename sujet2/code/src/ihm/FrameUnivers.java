@@ -11,8 +11,9 @@ public class FrameUnivers extends JFrame
     private int nbPlanete;
     private PanelUnivers panelUniv;
 
-    public static final int WIDTH = 500;
-    public static final int HEIGHT = 500;
+    public static final int WIDTH = 750;
+    public static final int HEIGHT = 750;
+
     public FrameUnivers(int nbPlanete)
     {
        
