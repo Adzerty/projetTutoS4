@@ -45,6 +45,9 @@ public class Planete
     private double tpsDebut;
     private double tpsFin;
 
+    private boolean calculCollisionFait;
+    private double mass;
+
     /*--------------------------------*/
 
     private PanelUnivers panelUnivers;
@@ -62,8 +65,8 @@ public class Planete
         int high = 180;
         this.angleRotation = r.nextInt(high-low) + low;
 
-        double randVitesse = MIN_VITESSE + (MAX_VITESSE - MIN_VITESSE) * r.nextDouble();
-        this.vitesse = new Vecteur(randVitesse*Math.cos(angleRotation), randVitesse*Math.sin(angleRotation));
+        this.randVitesse = MIN_VITESSE + (MAX_VITESSE - MIN_VITESSE) * r.nextDouble();
+        this.vitesse = new Vecteur(randVitesse*Math.cos(Math.toRadians(angleRotation)), randVitesse*Math.sin(Math.toRadians(angleRotation)));
 
         int y;
         int x;
@@ -95,7 +98,8 @@ public class Planete
 
         this.taille = (int)(MIN + (Math.random() * (MAX - MIN)));
         this.coord = new Coordonnees(x,y);
-        this.taille = (int)(MIN + (Math.random() * (MAX - MIN)));
+
+        this.mass = Math.PI * Math.pow(this.taille/2,2);
 
         }
 
@@ -124,6 +128,10 @@ public class Planete
         {
             while (true)
             {
+                if(debug)
+                {
+                    System.out.println(angleRotation + " : " + vitesse);
+                }
                 //On calcul le decalage de temps avec la derniere iteration de boucle
                 tpsDebut = System.currentTimeMillis();
                 deltaT = tpsDebut - tpsFin;
@@ -176,10 +184,8 @@ public class Planete
     {
         this.threadCol = new Thread(() ->
         {
-            System.out.println(this.angleRotation);
             while (true)
             {
-
                 ArrayList<Planete> ensPlanete = panelUnivers.getPlanetes();
 
                 for(Planete p : ensPlanete)
@@ -191,32 +197,44 @@ public class Planete
 
                         if(distance <= ((p.getTaille()/2) + (getTaille()/2)))
                         {
-                            System.out.println(this.angleRotation);
-                            //Deux planetes se touchent
-                            //variable de la planete "this" au moment du choc
-                            double mPlanete =  Math.PI * (Math.pow(getTaille()/2,2));
-                            Vecteur vPlanete =  this.vitesse;
-                            Vecteur pPlanete =  this.vitesse.multiplication(mPlanete);
+                            if(!calculCollisionFait)
+                            {
+                                calculCollisionFait = true;
+                                //QDM
+                                Vecteur p1 = vitesse.multiplication(mass);
+                                Vecteur p2 = p.vitesse.multiplication(p.mass);
+                                Vecteur p0 = p1.addition(p2);
+
+                                //Energie cinetique
+                                double Ec = ((Math.pow(p1.getvX(),2) + (Math.pow(p1.getvY(),2))) / (2*mass)) + ((Math.pow(p2.getvX(),2) + (Math.pow(p2.getvY(),2))) / (2*p.mass));
+
+                                //pPrimeY
+                                double p1PrimeY = p1.getvY();
+                                double p2PrimeY = p2.getvY();
+
+                                //pPrimeX
+                                double p1PrimeX = (mass*p0.getvX() - Math.pow(((mass + p.mass)*(2*mass*p.mass*Ec - p.mass*Math.pow(p1.getvY(),2) - mass*Math.pow(p2.getvY(),2)) - mass*p.mass*Math.pow(p0.getvX(),2)),1/2) / (mass + p.mass));
+                                double p2PrimeX = (p.mass*p0.getvX() - Math.pow(((mass + p.mass)*(2*mass*p.mass*Ec - p.mass*Math.pow(p1.getvY(),2) - mass*Math.pow(p2.getvY(),2)) - mass*p.mass*Math.pow(p0.getvX(),2)),1/2) / (mass + p.mass));
+
+                                //angles
+                                double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
+                                //double thetaPrime2 = Math.toDegrees(Math.atan(p2PrimeY / p2PrimeX));
+
+                                this.angleRotation = thetaPrime1;
+                                //p.angleRotation = thetaPrime2;
+
+                                //vitesses
+                                vitesse = new Vecteur(randVitesse*Math.cos(Math.toRadians(angleRotation)), randVitesse*Math.sin(Math.toRadians(angleRotation)));
+                                //p.vitesse = new Vecteur(p.randVitesse*Math.cos(Math.toRadians(p.angleRotation)), p.randVitesse*Math.sin(Math.toRadians(p.angleRotation)));
 
 
-                            //variable de la planete p (choquee) au moment du choc
-                            double mAutrePlanete =  Math.PI * (Math.pow(p.getTaille()/2,2));
-                            Vecteur vAutrePlanete =  p.vitesse;
-                            Vecteur pAutrePlanete =  vAutrePlanete.multiplication(mAutrePlanete);
 
-                            //Energie cinetique du choc
-                            double Ec = ( Math.pow(pPlanete.getvX(),2) + Math.pow(pPlanete.getvY(),2) ) / 2 * mPlanete  + (  Math.pow(pAutrePlanete.getvX(),2) + Math.pow(pAutrePlanete.getvY(),2)  ) / 2 * mAutrePlanete;
+                            }
 
-
-                            //Calcul des variables après le choc
-                            double pPrimeX = (mPlanete*pPlanete.getvX() - Math.pow(((mPlanete+mAutrePlanete)*(2*mPlanete*mAutrePlanete*Ec - mAutrePlanete*Math.pow(pPlanete.getvY(),2) - mPlanete*Math.pow(pAutrePlanete.getvY(),2) - mPlanete*mAutrePlanete*Math.pow(pPlanete.getvX(),2))),1/2))
-                                                /mPlanete+mAutrePlanete;
-
-                            double newAngle = pPlanete.getvY() / pPrimeX;
-
-                            angleRotation = Math.toDegrees(Math.atan(newAngle));
-
-
+                        }
+                        else
+                        {
+                            calculCollisionFait = false;
                         }
                     }
 

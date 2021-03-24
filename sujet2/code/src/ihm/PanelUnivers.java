@@ -62,8 +62,15 @@ public class PanelUnivers extends JPanel implements KeyListener
             }
         }
 
+        for(Planete p : planetes)
+        {
+            if(! p.estPandora())
+                p.checkCollisionsPlanetes();
+        }
+
         planetes.get(1).debug = true;
-        planetes.get(1).checkCollisionsPlanetes();
+
+
 
 
 
@@ -74,7 +81,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.vaisseau.startDeplacement();
 
         //On commence le thread de check de collisions
-        this.checkCollisions();
+        //this.checkCollisions();
     }
 
     public void checkCollisions()

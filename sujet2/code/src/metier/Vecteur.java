@@ -10,6 +10,13 @@ public class Vecteur
         this.vY = vY;
     }
 
+    public Vecteur(double norme, double angle, boolean b)
+    {
+        System.out.println("");
+        this.vX = Math.cos(angle)*norme;
+        this.vY = Math.sin(angle)*norme;
+    }
+
     public Vecteur multiplication(double k)
     {
         return new Vecteur(k*vX, k*vY);
@@ -45,4 +52,11 @@ public class Vecteur
         return Math.sqrt( (x*x) + (y*y) );
     }
 
+    @Override
+    public String toString() {
+        return "Vecteur{" +
+                "vX=" + vX +
+                ", vY=" + vY +
+                '}';
+    }
 }

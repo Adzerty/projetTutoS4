@@ -25,7 +25,7 @@ public class FrameUnivers extends JFrame
 
         this.setTitle("Sujet 2 - Equipe 1");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        //this.setLocation(50,50);
+        this.setLocation(50,50);
         this.setLocationRelativeTo(null);
         this.setSize(WIDTH,HEIGHT);
         this.setResizable(false);
