@@ -22,7 +22,7 @@ public class FrameUnivers extends JFrame
         this.addKeyListener(panelUniv);
         this.add(panelUniv);
 
-        this.setTitle("Sujet 1 - Equipe 1");
+        this.setTitle("Sujet 2 - Equipe 1");
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         //this.setLocation(50,50);
         this.setLocationRelativeTo(null);

@@ -13,6 +13,7 @@ public class Planete
     private  static final  int TAILLE_FRAME = FrameUnivers.HEIGHT;
     private static final int MIN = 25;
     private static final int MAX = 75;
+    private boolean pandora;
 
     /*-----
     ATTRIBUTS POUR LE MOUVEMENT
@@ -45,8 +46,9 @@ public class Planete
 
     private PanelUnivers panelUnivers;
 
-    public Planete(PanelUnivers p)
+    public Planete(boolean pandora, PanelUnivers p)
     {
+    	this.pandora = pandora;
         this.panelUnivers = p;
 
         this.imgP = (int)(Math.random()*5+1);
@@ -58,16 +60,26 @@ public class Planete
         double randVitesse = MIN_VITESSE + (MAX_VITESSE - MIN_VITESSE) * r.nextDouble();
         this.vitesse = new Vecteur(randVitesse*Math.cos(angleRotation), randVitesse*Math.sin(angleRotation));
 
-        int y = (int)(Math.random()*TAILLE_FRAME);
-        int x;
+        if (this.estPandora()){
 
-        if(y <= 350 && y >= 150)
-        {
-            do{
+            int x = 300+(int)(Math.random() * ( TAILLE_FRAME - 300));
+            int y = 200+(int)(Math.random() * ( TAILLE_FRAME - 200));
+            this.coord = new Coordonnees(x,y);
+            this.taille = 50;
+        }
+        else {
+
+            int y = (int)(Math.random()*TAILLE_FRAME);
+            int x;
+
+            if(y <= 350 && y >= 150)
+            {
+                do{
+                    x = (int)(Math.random()*TAILLE_FRAME);
+                }while(x <= 350 && x >= 150);
+            }else
                 x = (int)(Math.random()*TAILLE_FRAME);
-            }while(x <= 350 && x >= 150);
-        }else
-            x = (int)(Math.random()*TAILLE_FRAME);
+        }
 
         this.coord = new Coordonnees(x,y);
 
@@ -75,7 +87,10 @@ public class Planete
         this.posY = coord.getY();
 
         this.taille = (int)(MIN + (Math.random() * (MAX - MIN)));
-    }
+        this.coord = new Coordonnees(x,y);
+        this.taille = (int)(MIN + (Math.random() * (MAX - MIN)));
+
+        }
 
 
 
@@ -174,4 +189,5 @@ public class Planete
     public int getImgP() {
         return imgP;
     }
+    public boolean estPandora(){return this.pandora;}
 }
