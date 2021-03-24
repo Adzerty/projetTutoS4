@@ -3,7 +3,6 @@ package ihm;
 import metier.*;
 
 import javax.imageio.ImageIO;
-import jdk.swing.interop.SwingInterOpUtils;
 import metier.Coordonnees;
 import metier.Planete;
 import metier.Vaisseau;
@@ -54,15 +53,16 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=-1; i<nbPlanetes; i++){
-            if (i == -1){
-                planetes.add(new Planete(true));
+        for (int i=0; i<=nbPlanetes; i++){
+            if (i == 0){
+                planetes.add(new Planete(true, this));
             }
             else {
-                planetes.add(new Planete(false));
+                planetes.add(new Planete(false, this));
+                planetes.get(i).startDeplacementPlanete();
             }
-
         }
+
         this.addKeyListener(this);
 
         //On commence le thread de deplacement du vaisseau
@@ -133,88 +133,75 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         Graphics2D g2 = (Graphics2D)g;
 
-      /*  try {
-            BufferedImage imgFond = ImageIO.read(PanelUnivers.class.getResourceAsStream("/fond.jpg"));
-            g.drawImage(imgFond, 0, 0,FrameUnivers.WIDTH,FrameUnivers.HEIGHT, this);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-*/
-
-
         //Pour chaque planetes on cree un rond
-        for (Planete p : planetes)
-        {
-            if(p.getPosX() < 0 - p.getTaille())
+        for (Planete p : planetes) {
+            if (p.getPosX() < 0 - p.getTaille())
                 p.setPosX(width);
-            else
-            if(p.getPosX()>= width + p.getTaille())
+            else if (p.getPosX() >= width + p.getTaille())
                 p.setPosX(0);
 
-            if(p.getPosY() < 0 - p.getTaille())
+            if (p.getPosY() < 0 - p.getTaille())
                 p.setPosY(height);
-            else
-            if(p.getPosY()>= height + p.getTaille())
+            else if (p.getPosY() >= height + p.getTaille())
                 p.setPosY(0);
 
             try {
-                BufferedImage imgPlanete = ImageIO.read(PanelUnivers.class.getResourceAsStream("/planete/p"+p.getImgP()+".png"));
-                if (p.estPandora())
-                {
-                	g2.setColor(Color.BLUE);
-                	g2.fillOval(p.getCoord().getX(),p.getCoord().getY(),p.getTaille(),p.getTaille());
-                	g2.setColor(Color.BLACK);
-            	}
-            	else 
- 					g.drawImage(imgPlanete, (int) p.getPosX(),(int) p.getPosY(),p.getTaille(),p.getTaille(), this);
-               
+                BufferedImage imgPlanete = ImageIO.read(PanelUnivers.class.getResourceAsStream("/planete/p" + p.getImgP() + ".png"));
+                if (p.estPandora()) {
+                    g2.setColor(Color.BLUE);
+                    g2.fillOval(p.getCoord().getX(), p.getCoord().getY(), p.getTaille(), p.getTaille());
+                    g2.setColor(Color.BLACK);
+                } else
+                    g.drawImage(imgPlanete, (int) p.getPosX(), (int) p.getPosY(), p.getTaille(), p.getTaille(), this);
 
-            } catch (Exception ex){
+
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
 
-        //On tourne le vaisseau selon l'angle
-        g2.rotate(Math.toRadians(vaisseau.getAngleRot())+angleOffset, vaisseau.getxBarycentre()+vaisseau.getPosX(), vaisseau.getyBarycentre()+vaisseau.getPosY());
+            //On tourne le vaisseau selon l'angle
+            g2.rotate(Math.toRadians(vaisseau.getAngleRot()) + angleOffset, vaisseau.getxBarycentre() + vaisseau.getPosX(), vaisseau.getyBarycentre() + vaisseau.getPosY());
 
-        //On calcul la position en mode torique
-        if(vaisseau.getPosX() < 0 - vaisseau.getImage().getHeight())
-            vaisseau.setPosX(width);
-        else
-            if(vaisseau.getPosX()>= width + vaisseau.getImage().getHeight())
+            //On calcul la position en mode torique
+            if (vaisseau.getPosX() < 0 - vaisseau.getImage().getHeight())
+                vaisseau.setPosX(width);
+            else if (vaisseau.getPosX() >= width + vaisseau.getImage().getHeight())
                 vaisseau.setPosX(0);
 
-        if(vaisseau.getPosY() < 0 - vaisseau.getImage().getHeight())
-            vaisseau.setPosY(height);
-        else
-            if(vaisseau.getPosY()>= height + vaisseau.getImage().getHeight())
+            if (vaisseau.getPosY() < 0 - vaisseau.getImage().getHeight())
+                vaisseau.setPosY(height);
+            else if (vaisseau.getPosY() >= height + vaisseau.getImage().getHeight())
                 vaisseau.setPosY(0);
 
 
             //On dessine le vaisseau
-        g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(),this);
+            g2.drawImage(vaisseau.getImage(), vaisseau.getPosX(), vaisseau.getPosY(), this);
 
 
-        if (this.aTouche ) //Si le vaisseau touche
-        {
-            //On affiche le .gif d'explosion et on arrete tout le jeu
-            Image icon2 = new ImageIcon(Vaisseau.class.getResource("/explosion.gif")).getImage();
-            g2.drawImage(icon2,  this.vaisseau.getPosX() - 75,  this.vaisseau.getPosY()- 152, this);
-            this.vaisseau.stopDeplacement();
+            if (this.aTouche) //Si le vaisseau touche
+            {
+                //On affiche le .gif d'explosion et on arrete tout le jeu
+                Image icon2 = new ImageIcon(Vaisseau.class.getResource("/explosion.gif")).getImage();
+                g2.drawImage(icon2, this.vaisseau.getPosX() - 75, this.vaisseau.getPosY() - 152, this);
+                this.vaisseau.stopDeplacement();
 
-            for(Planete p : planetes)
-                p.stopDeplacement();
-            
-            this.gameOver = true;
-        }
+                for (Planete p1 : planetes)
+                {
+                    if(p1.getThreadDep() != null)
+                        p1.stopDeplacement();
+                }
+                this.gameOver = true;
+            }
 
-        if(! gameOver) //Si le jeu n'est pas game over on gere l'affichage en transparence de la flamme
-        {
-            float vitesse = (float) vaisseau.getVitesse().getNorme()*10;
-            if(vitesse>1)vitesse=1;
+            if (!gameOver) //Si le jeu n'est pas game over on gere l'affichage en transparence de la flamme
+            {
+                float vitesse = (float) vaisseau.getVitesse().getNorme() * 10;
+                if (vitesse > 1) vitesse = 1;
 
-            g2.setComposite(AlphaComposite.SrcOver.derive(vitesse));
-            g2.drawImage(vaisseau.getPropeling(),vaisseau.getPosX(), vaisseau.getPosY(),this);
-        }
+                g2.setComposite(AlphaComposite.SrcOver.derive(vitesse));
+                g2.drawImage(vaisseau.getPropeling(), vaisseau.getPosX(), vaisseau.getPosY(), this);
+            }
 
     }
 

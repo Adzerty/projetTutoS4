@@ -60,17 +60,19 @@ public class Planete
         double randVitesse = MIN_VITESSE + (MAX_VITESSE - MIN_VITESSE) * r.nextDouble();
         this.vitesse = new Vecteur(randVitesse*Math.cos(angleRotation), randVitesse*Math.sin(angleRotation));
 
+        int y;
+        int x;
+
         if (this.estPandora()){
 
-            int x = 300+(int)(Math.random() * ( TAILLE_FRAME - 300));
-            int y = 200+(int)(Math.random() * ( TAILLE_FRAME - 200));
+            x = 300+(int)(Math.random() * ( TAILLE_FRAME - 300));
+            y = 200+(int)(Math.random() * ( TAILLE_FRAME - 200));
             this.coord = new Coordonnees(x,y);
             this.taille = 50;
         }
         else {
 
-            int y = (int)(Math.random()*TAILLE_FRAME);
-            int x;
+            y = (int)(Math.random()*TAILLE_FRAME);
 
             if(y <= 350 && y >= 150)
             {
@@ -168,6 +170,10 @@ public class Planete
     public void stopDeplacement()
     {
         this.threadDep.stop();
+    }
+
+    public Thread getThreadDep() {
+        return threadDep;
     }
 
     public double getPosX() {
