@@ -132,11 +132,14 @@ public class Planete
             while (true)
             {
                 Planete p = this;
-                if(coli != null && Math.sqrt(Math.pow(p.getPosX() - coli.getPosX(), 2) + Math.pow(p.getPosY() - coli.getPosY(), 2)) > (p.getTaille() / 2 + coli.getTaille() / 2)) {
-
+                if(coli != null && this.isEnChoc() && Math.sqrt(Math.pow(p.getPosX() - coli.getPosX(), 2) + Math.pow(p.getPosY() - coli.getPosY(), 2)) > (p.getTaille() / 2 + coli.getTaille() / 2)) {
                     coli.setEnChoc(false);
                     this.setEnChoc(false);
                     coli = null;
+                    System.out.println("Plus en choc connard");
+                }
+                else if(coli != null){
+                    //System.out.println("aie fdp");
                 }
                 for(Planete p2 : panelUnivers.getPlanetes()) {
                     if(p != p2 && !p.estPandora() && !p2.estPandora()) {
@@ -144,6 +147,7 @@ public class Planete
 
                         if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) /*&& coli != p2*/ && !this.enChoc/*&& pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2*/) {
                             //QDM
+                            System.out.println("BOOOOOOM");
                             Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
                             Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
                             Vecteur pp0 = pp1.addition(pp2);
@@ -163,17 +167,10 @@ public class Planete
                             double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
                             double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
 
-                            if(p1PrimeX < 0)
-                                if(p1PrimeY > 0)
-                                    thetaPrime1 += Math.PI;
-                                else
-                                    thetaPrime1 -= Math.PI;
+                            if(p1PrimeX < 0) thetaPrime1 += Math.PI;
 
-                            if(p2PrimeX < 0)
-                                if(p2PrimeY > 0)
-                                    thetaPrime2 -= Math.PI;
-                                else
-                                    thetaPrime2 += Math.PI;
+
+                            if(p2PrimeX> 0) thetaPrime2 += Math.PI;
 
                             p.angleRotation = Math.toDegrees(thetaPrime1);
                             p2.angleRotation = Math.toDegrees(thetaPrime2);
