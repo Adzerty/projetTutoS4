@@ -3,6 +3,7 @@ package metier;
 import ihm.*;
 
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,6 +16,7 @@ public class Planete
     private static final int MIN = 25;
     private static final int MAX = 75;
     private boolean pandora;
+    private boolean enChoc = false;
 
     /*-----
     ATTRIBUTS POUR LE MOUVEMENT
@@ -126,11 +128,64 @@ public class Planete
          */
         this.threadDep = new Thread(() ->
         {
+            Planete coli = null;
             while (true)
             {
-                if(debug)
-                {
-                    System.out.println(angleRotation + " : " + vitesse);
+                Planete p = this;
+                if(coli != null && Math.sqrt(Math.pow(p.getPosX() - coli.getPosX(), 2) + Math.pow(p.getPosY() - coli.getPosY(), 2)) > (p.getTaille() / 2 + coli.getTaille() / 2)) {
+
+                    coli.setEnChoc(false);
+                    this.setEnChoc(false);
+                    coli = null;
+                }
+                for(Planete p2 : panelUnivers.getPlanetes()) {
+                    if(p != p2 && !p.estPandora() && !p2.estPandora()) {
+                        double distance = Math.sqrt(Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2));
+
+                        if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) /*&& coli != p2*/ && !this.enChoc/*&& pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2*/) {
+                            //QDM
+                            Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
+                            Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
+                            Vecteur pp0 = pp1.addition(pp2);
+
+                            //Energie cinetique
+                            double Ec = ((Math.pow(pp1.getvX(), 2) + (Math.pow(pp1.getvY(), 2))) / (2 * p.getMass())) + ((Math.pow(pp2.getvX(), 2) + (Math.pow(pp2.getvY(), 2))) / (2 * p2.getMass()));
+
+                            //pPrimeY
+                            double p1PrimeY = pp1.getvY();
+                            double p2PrimeY = pp2.getvY();
+
+                            //pPrimeX
+                            double p1PrimeX = (p.getMass() * pp0.getvX() - Math.pow(((p.getMass() + p2.getMass()) * (2 * p.getMass() * p2.getMass() * Ec - p2.getMass() * Math.pow(pp1.getvY(), 2) - p.getMass() * Math.pow(pp2.getvY(), 2)) - p.getMass() * p2.getMass() * Math.pow(pp0.getvX(), 2)), 1 / 2)) / (p.getMass() + p2.getMass());
+                            double p2PrimeX = (p2.getMass() * pp0.getvX() + Math.pow(((p.getMass() + p2.getMass()) * (2 * p.getMass() * p2.getMass() * Ec - p2.getMass() * Math.pow(pp1.getvY(), 2) - p.getMass() * Math.pow(pp2.getvY(), 2)) - p.getMass() * p2.getMass() * Math.pow(pp0.getvX(), 2)), 1 / 2)) / (p.getMass() + p2.getMass());
+
+                            //angles
+                            double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
+                            double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
+
+                            if(p1PrimeX < 0)
+                                if(p1PrimeY > 0)
+                                    thetaPrime1 += Math.PI;
+                                else
+                                    thetaPrime1 -= Math.PI;
+
+                            if(p2PrimeX < 0)
+                                if(p2PrimeY > 0)
+                                    thetaPrime2 -= Math.PI;
+                                else
+                                    thetaPrime2 += Math.PI;
+
+                            p.angleRotation = Math.toDegrees(thetaPrime1);
+                            p2.angleRotation = Math.toDegrees(thetaPrime2);
+
+                            //vitesses
+                            p.setVitesse(new Vecteur(p.getRandVitesse() * Math.cos(thetaPrime1), p.getRandVitesse() * Math.sin(thetaPrime1)));
+                            p2.setVitesse(new Vecteur(p2.getRandVitesse() * Math.cos(thetaPrime2), p2.getRandVitesse() * Math.sin(thetaPrime2)));
+                            coli = p2;
+                            coli.setEnChoc(true);
+                            this.setEnChoc(true);
+                        }
+                    }
                 }
                 //On calcul le decalage de temps avec la derniere iteration de boucle
                 tpsDebut = System.currentTimeMillis();
@@ -142,27 +197,6 @@ public class Planete
                 //On calcul la nouvelle position
                 posX = posX + (vitesse.getvX() * deltaT);
                 posY = posY + (vitesse.getvY() * deltaT);
-
-                //Calcul d'un nouveau vecteur permettant la deceleration
-                /*Vecteur vitInit = new Vecteur(vitesse.getvX(), vitesse.getvY());
-                double vitFinal = vitInit.getNorme() - (deltaT * decelerarion);
-
-                // On reduit la vitesse
-                f(vitInit.getNorme() != 0)
-                {
-                    vitesse.setvX(vitesse.getvX() * (vitFinal / vitInit.getNorme()));
-                    vitesse.setvY(vitesse.getvY() * (vitFinal / vitInit.getNorme()));
-                }
-
-                //On stop la fusee quand elle arrive a < min_vitesse
-                if(vitesse.getNorme() < MIN_VITESSE)
-                {
-                    vitesse.setvX(0);
-                    vitesse.setvY(0);
-                }*/
-
-                //System.out.println((int)posX + " : " + (int)posY);
-                //On repeint la toile
 
                 panelUnivers.repaint();
 
@@ -220,5 +254,13 @@ public class Planete
 
     public double getRandVitesse() {
         return randVitesse;
+    }
+
+    public boolean isEnChoc() {
+        return enChoc;
+    }
+
+    public void setEnChoc(boolean enChoc) {
+        this.enChoc = enChoc;
     }
 }

@@ -72,7 +72,7 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         //On commence le thread de check de collisions
         //this.checkCollisions();
-        this.checkCollisionsPlanetes();
+        //this.checkCollisionsPlanetes();
     }
 
     public void checkCollisions()
@@ -129,8 +129,7 @@ public class PanelUnivers extends JPanel implements KeyListener
     {
         Thread threadColP = new Thread(() ->
         {
-            Planete pco1 = null;
-            Planete pco2 = null;
+            boolean bool = false;
             while (true)
             {
                 for(Planete p : planetes)
@@ -143,10 +142,8 @@ public class PanelUnivers extends JPanel implements KeyListener
                             //On calcul la distance entre la planete et chaque pixel du vaisseau
                             double distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
 
-                            if(distance <= (p.getTaille() / 2  + p2.getTaille() / 2) && pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2)
+                            if(distance <= (p.getTaille() / 2  + p2.getTaille() / 2) /*&& pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2*/)
                             {
-                                pco1 = p;
-                                pco2 = p2;
 
                                 //QDM
                                 Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
@@ -159,7 +156,6 @@ public class PanelUnivers extends JPanel implements KeyListener
                                 //pPrimeY
                                 double p1PrimeY = pp1.getvY();
                                 double p2PrimeY = pp2.getvY();
-                                System.out.println(pp1.getvY() + " " + pp2.getvY());
 
                                 //pPrimeX
                                 double p1PrimeX = (p.getMass()*pp0.getvX() - Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2)) / (p.getMass() +p2.getMass());
@@ -168,9 +164,9 @@ public class PanelUnivers extends JPanel implements KeyListener
                                 //angles
                                 double thetaPrime1 = Math.tan(p1PrimeY / p1PrimeX);
                                 double thetaPrime2 = Math.tan(p2PrimeY / p2PrimeX);
-                                System.out.println(p1PrimeX + " " + p1PrimeY);
-                                System.out.println(p2PrimeX + " " + p2PrimeY);
-                                System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
+                                //System.out.println(p1PrimeX + " " + p1PrimeY);
+                                //System.out.println(p2PrimeX + " " + p2PrimeY);
+                                //System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
 
                                 p.angleRotation = Math.toDegrees(thetaPrime1);
                                 p2.angleRotation = Math.toDegrees(thetaPrime2);
@@ -178,9 +174,11 @@ public class PanelUnivers extends JPanel implements KeyListener
                                 //vitesses
                                 p.setVitesse(  new Vecteur(p.getRandVitesse()*Math.cos(thetaPrime1), p.getRandVitesse()*Math.sin(thetaPrime1)));
                                 p2.setVitesse( new Vecteur(p2.getRandVitesse()*Math.cos(thetaPrime2), p2.getRandVitesse()*Math.sin(thetaPrime2)));
-
                             }
-
+                            while(distance <= (p.getTaille() / 2  + p2.getTaille() / 2))
+                            {
+                                distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
+                            }
                         }
                     }
                 }
