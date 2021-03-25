@@ -144,11 +144,11 @@ public class Planete
                 posY = posY + (vitesse.getvY() * deltaT);
 
                 //Calcul d'un nouveau vecteur permettant la deceleration
-                Vecteur vitInit = new Vecteur(vitesse.getvX(), vitesse.getvY());
+                /*Vecteur vitInit = new Vecteur(vitesse.getvX(), vitesse.getvY());
                 double vitFinal = vitInit.getNorme() - (deltaT * decelerarion);
 
                 // On reduit la vitesse
-                if(vitInit.getNorme() != 0)
+                f(vitInit.getNorme() != 0)
                 {
                     vitesse.setvX(vitesse.getvX() * (vitFinal / vitInit.getNorme()));
                     vitesse.setvY(vitesse.getvY() * (vitFinal / vitInit.getNorme()));
@@ -159,7 +159,7 @@ public class Planete
                 {
                     vitesse.setvX(0);
                     vitesse.setvY(0);
-                }
+                }*/
 
                 //System.out.println((int)posX + " : " + (int)posY);
                 //On repeint la toile
