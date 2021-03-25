@@ -53,14 +53,32 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=0; i<=nbPlanetes; i++) {
-            if (i == 0) {
-                planetes.add(new Planete(true, this));
-            } else {
-                planetes.add(new Planete(false, this));
-                planetes.get(i).startDeplacementPlanete();
-            }
-        }
+        /*for (int i=0; i<nbPlanetes; i++) {
+            planetes.add(new Planete(false, this));
+            planetes.get(i).startDeplacementPlanete();
+        }*/
+
+        planetes.add(new Planete(false, this));
+        planetes.add(new Planete(false, this));
+
+        planetes.get(0).angleRotation = -180;
+        planetes.get(1).angleRotation = 0;
+
+        planetes.get(0).setPosX(0);
+        planetes.get(1).setPosX(300);
+
+        planetes.get(0).setPosY(300);
+        planetes.get(1).setPosY(300);
+
+        planetes.get(0).setVitesse( new Vecteur(planetes.get(0).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(0).angleRotation)), planetes.get(0).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(0).angleRotation))));
+        planetes.get(1).setVitesse( new Vecteur(planetes.get(1).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(1).angleRotation)), planetes.get(1).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(1).angleRotation))));
+
+        planetes.get(0).startDeplacementPlanete();
+        planetes.get(1).startDeplacementPlanete();
+
+
+
+        //planetes.add(new Planete(true, this));
 
         //planetes.get(1).debug = true;
 
@@ -129,8 +147,6 @@ public class PanelUnivers extends JPanel implements KeyListener
     {
         Thread threadColP = new Thread(() ->
         {
-            Planete pco1 = null;
-            Planete pco2 = null;
             while (true)
             {
                 for(Planete p : planetes)
@@ -139,38 +155,86 @@ public class PanelUnivers extends JPanel implements KeyListener
                     {
                         if(p != p2 && !p.estPandora() && !p2.estPandora())
                         {
+
                             //System.out.println(p.getVitesse().toString() + " " + p2.getVitesse().toString());
                             //On calcul la distance entre la planete et chaque pixel du vaisseau
-                            double distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
+                            double distance = Math.sqrt( ((p.getPosX() - p2.getPosX()) * (p.getPosX() - p2.getPosX())) + ( (p.getPosY() - p2.getPosY()) * (p.getPosY() - p2.getPosY())));
 
-                            if(distance <= (p.getTaille() / 2  + p2.getTaille() / 2) && pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2)
+                            if(distance <= (p.getTaille()/2  + p2.getTaille()/2))
                             {
-                                pco1 = p;
-                                pco2 = p2;
 
                                 //QDM
                                 Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
                                 Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
                                 Vecteur pp0 = pp1.addition(pp2);
 
+                                //System.out.println("----------- DEBUG ------------");
+
+                                //System.out.println("p1 vitesse : " + p.getVitesse());
+                                //System.out.println("p2 vitesse : " + p2.getVitesse());
+
+                                //System.out.println("p1 angle : " + p.angleRotation);
+                                //System.out.println("p2 angle : " + p2.angleRotation);
+
+                                //System.out.println("p1 masse : " + p.getMass());
+                                //System.out.println("p2 masse : " + p2.getMass());
+
+
+                                //System.out.println(" --------------------------- ");
+
+                                //System.out.println("pp1 : " + pp1 );
+                                //System.out.println("pp2 : " + pp2 );
+                                //System.out.println("pp0 : " + pp0 );
+
+
                                 //Energie cinetique
-                                double Ec = ( (Math.pow(pp1.getvX(),2) + (Math.pow(pp1.getvY(),2))) / (2*p.getMass())) + ((Math.pow(pp2.getvX(),2) + (Math.pow(pp2.getvY(),2))) / (2*p2.getMass()));
+                                double Ec = ((pp1.getvX()*pp1.getvX() + pp1.getvY()*pp1.getvY()) / (2*p.getMass())) + ((pp2.getvX()*pp2.getvX() + pp2.getvY()*pp2.getvY()) / (2*p2.getMass()));
+
+                                //System.out.println(" --------------------------- ");
+
+                                //System.out.println("Ec : " + Ec );
 
                                 //pPrimeY
                                 double p1PrimeY = pp1.getvY();
                                 double p2PrimeY = pp2.getvY();
-                                System.out.println(pp1.getvY() + " " + pp2.getvY());
 
                                 //pPrimeX
-                                double p1PrimeX = (p.getMass()*pp0.getvX() - Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2)) / (p.getMass() +p2.getMass());
-                                double p2PrimeX = (p2.getMass()*pp0.getvX() + Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2)) / (p.getMass() + p2.getMass());
+
+                                double etapePuissance1Demi = ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())) /
+                                        ( ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())) * ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())));
+                                double p1PrimeX = (p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass());
+                                double p2PrimeX = (p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass());
+
+                                //System.out.println(" --------------------------- ");
+
+                                //System.out.println("p1PrimeX : " + p1PrimeX );
+                                //System.out.println("p2PrimeX : " + p2PrimeX );
 
                                 //angles
-                                double thetaPrime1 = Math.tan(p1PrimeY / p1PrimeX);
-                                double thetaPrime2 = Math.tan(p2PrimeY / p2PrimeX);
-                                System.out.println(p1PrimeX + " " + p1PrimeY);
-                                System.out.println(p2PrimeX + " " + p2PrimeY);
-                                System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
+                                double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
+                                double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
+
+
+                                if(p1PrimeX < 0)
+                                    if(p1PrimeY > 0)
+                                        thetaPrime1 += Math.PI/2;
+                                    else
+                                        thetaPrime1 -= Math.PI/2;
+
+                                if(p2PrimeX< 0)
+                                    if(p2PrimeY > 0)
+                                        thetaPrime2 -= Math.PI/2;
+                                    else
+                                        thetaPrime2 += Math.PI/2;
+
+                                //System.out.println(" --------------------------- ");
+
+                                //System.out.println("tPrime1 : " + Math.toDegrees(thetaPrime1));
+                                //System.out.println("tPrime2 : " + Math.toDegrees(thetaPrime2));
+
+                                //System.out.println(p1PrimeX + " " + p1PrimeY);
+                                //System.out.println(p2PrimeX + " " + p2PrimeY);
+                                //System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
 
                                 p.angleRotation = Math.toDegrees(thetaPrime1);
                                 p2.angleRotation = Math.toDegrees(thetaPrime2);
