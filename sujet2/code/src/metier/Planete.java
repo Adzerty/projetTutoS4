@@ -180,69 +180,6 @@ public class Planete
         this.threadDep.stop();
     }
 
-    public void checkCollisionsPlanetes()
-    {
-        this.threadCol = new Thread(() ->
-        {
-            while (true)
-            {
-                ArrayList<Planete> ensPlanete = panelUnivers.getPlanetes();
-
-                for(Planete p : ensPlanete)
-                {
-                    if(p != this && !p.estPandora())
-                    {
-                        //On calcul la distance entre la planete et chaque pixel du vaisseau
-                        double distance = Math.sqrt( Math.pow(posX - p.posX, 2) + Math.pow(posY - p.posY, 2) );
-
-                        if(distance <= ((p.getTaille()/2) + (getTaille()/2)))
-                        {
-                            if(!calculCollisionFait)
-                            {
-                                calculCollisionFait = true;
-                                //QDM
-                                Vecteur p1 = vitesse.multiplication(mass);
-                                Vecteur p2 = p.vitesse.multiplication(p.mass);
-                                Vecteur p0 = p1.addition(p2);
-
-                                //Energie cinetique
-                                double Ec = ((Math.pow(p1.getvX(),2) + (Math.pow(p1.getvY(),2))) / (2*mass)) + ((Math.pow(p2.getvX(),2) + (Math.pow(p2.getvY(),2))) / (2*p.mass));
-
-                                //pPrimeY
-                                double p1PrimeY = p1.getvY();
-                                double p2PrimeY = p2.getvY();
-
-                                //pPrimeX
-                                double p1PrimeX = (mass*p0.getvX() - Math.pow(((mass + p.mass)*(2*mass*p.mass*Ec - p.mass*Math.pow(p1.getvY(),2) - mass*Math.pow(p2.getvY(),2)) - mass*p.mass*Math.pow(p0.getvX(),2)),1/2) / (mass + p.mass));
-                                double p2PrimeX = (p.mass*p0.getvX() - Math.pow(((mass + p.mass)*(2*mass*p.mass*Ec - p.mass*Math.pow(p1.getvY(),2) - mass*Math.pow(p2.getvY(),2)) - mass*p.mass*Math.pow(p0.getvX(),2)),1/2) / (mass + p.mass));
-
-                                //angles
-                                double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
-                                //double thetaPrime2 = Math.toDegrees(Math.atan(p2PrimeY / p2PrimeX));
-
-                                this.angleRotation = thetaPrime1;
-                                //p.angleRotation = thetaPrime2;
-
-                                //vitesses
-                                vitesse = new Vecteur(randVitesse*Math.cos(Math.toRadians(angleRotation)), randVitesse*Math.sin(Math.toRadians(angleRotation)));
-                                //p.vitesse = new Vecteur(p.randVitesse*Math.cos(Math.toRadians(p.angleRotation)), p.randVitesse*Math.sin(Math.toRadians(p.angleRotation)));
-
-
-
-                            }
-
-                        }
-                        else
-                        {
-                            calculCollisionFait = false;
-                        }
-                    }
-
-                }
-            }
-        });
-        this.threadCol.start();
-    }
 
     public Thread getThreadDep() {
         return threadDep;
@@ -268,4 +205,20 @@ public class Planete
         return imgP;
     }
     public boolean estPandora(){return this.pandora;}
+
+    public Vecteur getVitesse() {
+        return vitesse;
+    }
+
+    public void setVitesse(Vecteur vitesse) {
+        this.vitesse = vitesse;
+    }
+
+    public double getMass() {
+        return mass;
+    }
+
+    public double getRandVitesse() {
+        return randVitesse;
+    }
 }

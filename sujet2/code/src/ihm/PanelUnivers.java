@@ -62,17 +62,7 @@ public class PanelUnivers extends JPanel implements KeyListener
             }
         }
 
-        for(Planete p : planetes)
-        {
-            if(! p.estPandora())
-                p.checkCollisionsPlanetes();
-        }
-
-        planetes.get(1).debug = true;
-
-
-
-
+        //planetes.get(1).debug = true;
 
 
         this.addKeyListener(this);
@@ -82,6 +72,7 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         //On commence le thread de check de collisions
         //this.checkCollisions();
+        this.checkCollisionsPlanetes();
     }
 
     public void checkCollisions()
@@ -132,6 +123,60 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         });
         check.start();
+    }
+
+    public void checkCollisionsPlanetes()
+    {
+        Thread threadColP = new Thread(() ->
+        {
+            while (true)
+            {
+                for(Planete p : planetes)
+                {
+                    for(Planete p2 : planetes )
+                    {
+                        if(p != p2 && !p.estPandora() && !p2.estPandora())
+                        {
+                            //On calcul la distance entre la planete et chaque pixel du vaisseau
+                            double distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
+
+                            if(distance <= (p.getTaille() / 2  + p2.getTaille() / 2))
+                            {
+                                //QDM
+                                Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
+                                Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
+                                Vecteur pp0 = pp1.addition(pp2);
+
+                                //Energie cinetique
+                                double Ec = ( (Math.pow(pp1.getvX(),2) + (Math.pow(pp1.getvY(),2))) / (2*p.getMass())) + ((Math.pow(pp2.getvX(),2) + (Math.pow(pp2.getvY(),2))) / (2*p2.getMass()));
+
+                                //pPrimeY
+                                double p1PrimeY = pp1.getvY();
+                                double p2PrimeY = pp2.getvY();
+
+                                //pPrimeX
+                                double p1PrimeX = (p.getMass()*pp0.getvX() - Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2) / (p.getMass() +p2.getMass()));
+                                double p2PrimeX = (p2.getMass()*pp0.getvX() + Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2) / (p.getMass() + p2.getMass()));
+
+                                //angles
+                                double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
+                                double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
+
+                                p.angleRotation = thetaPrime1;
+                                p2.angleRotation = thetaPrime2;
+
+                                //vitesses
+                                p.setVitesse(  new Vecteur(p.getRandVitesse()*Math.cos(thetaPrime1), p.getRandVitesse()*Math.sin(thetaPrime1)));
+                                p2.setVitesse( new Vecteur(p2.getRandVitesse()*Math.cos(thetaPrime2), p2.getRandVitesse()*Math.sin(thetaPrime2)));
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        });
+        threadColP.start();
     }
 
     public void setCoods(Coordonnees coods) {
