@@ -130,18 +130,21 @@ public class Planete
         this.threadDep = new Thread(() ->
         {
             Planete coli = null;
-            Boolean choque = false;
             while (true)
             {
                 Planete p = this;
                 if(coli != null)
-                if(choque && Math.sqrt( ((p.getPosX() - coli.getPosX()) * (p.getPosX() - coli.getPosX())) + ( (p.getPosY() - coli.getPosY()) * (p.getPosY() - coli.getPosY()))) > (p.getTaille() / 2 + coli.getTaille() / 2)) choque = false;
+                if(this.enChoc && Math.sqrt( ((p.getPosX() - coli.getPosX()) * (p.getPosX() - coli.getPosX())) + ( (p.getPosY() - coli.getPosY()) * (p.getPosY() - coli.getPosY()))) > (p.getTaille() / 2 + coli.getTaille() / 2)) {
+                    this.setEnChoc(false);
+                    coli.setEnChoc(false);
+                    coli = null;
+                }
 
                 for(Planete p2 : panelUnivers.getPlanetes()) {
                     if(p != p2 && !p.estPandora() && !p2.estPandora())
                     {
                         double distance = Math.sqrt( ((p.getPosX() - p2.getPosX()) * (p.getPosX() - p2.getPosX())) + ( (p.getPosY() - p2.getPosY()) * (p.getPosY() - p2.getPosY())));
-                        if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) && !choque )
+                        if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) )
                         {
 
                             //CALCUL CHANGEMENT DE REPERE
@@ -164,6 +167,7 @@ public class Planete
                             double vPP2x = n.getvX() * p2.getVitesse().getvX() + n.getvY() * p2.getVitesse().getvY();
                             double vPP2y = g.getvX() * p2.getVitesse().getvX() + g.getvY() * p2.getVitesse().getvY();
 
+                            //VECTEURS VITESSE REPERE NG
                             Vecteur vPP1 = new Vecteur(vPP1x,vPP1y);
                             Vecteur vPP2 = new Vecteur(vPP2x,vPP2y);
 
@@ -177,13 +181,21 @@ public class Planete
 
                             //pPrimeY
                             double p1PrimeY = pp1.getvY();
+                            double p2PrimeY = pp2.getvY();
+
+                            //calcul k
+                            //double kmin = (p2.getMass() * (pp1.getvY()*pp1.getvY()))+(p.getMass()* (pp2.getvY()*pp2.getvY())) / (2*p.getMass()*p2.getMass()*Ec) + ((pp0.getvX() * pp0.getvX())/(2*(p.getMass()+p2.getMass())));
+
 
                             //pPrimeX
                             double etapePuissance1Demi = Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())),0.5);
-                            double p1PrimeX = ((p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass()));
+                            double p1PrimeX = ((p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() + p2.getMass()));
+                            double p2PrimeX = ((p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass()));
 
                             //angles
                             double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
+                            double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
+
 
                             if (p1PrimeX<0)
                                 if (p1PrimeY>0)
@@ -191,15 +203,29 @@ public class Planete
                                 else
                                     thetaPrime1-=Math.PI;
 
+                            if (p2PrimeX<0)
+                                if (p2PrimeY>0)
+                                    thetaPrime2+=Math.PI;
+                                else
+                                    thetaPrime2-=Math.PI;
+
                             p.angleRotation = Math.toDegrees(thetaPrime1);
+                            p.angleRotation = Math.toDegrees(thetaPrime2);
 
-                            //vitesses
-
+                            //vitesses 1
                             Vecteur vitesse1NG = new Vecteur(p.getRandVitesse() * Math.cos(thetaPrime1), p.getRandVitesse() * Math.sin(thetaPrime1));
                             Vecteur vitesse1XY = new Vecteur((n.getvX()*vitesse1NG.getvX()+g.getvX()*vitesse1NG.getvY()),(n.getvY()*vitesse1NG.getvX()+g.getvY()*vitesse1NG.getvY()));
+                            //vitesse 2
+                            Vecteur vitesse2NG = new Vecteur(p2.getRandVitesse() * Math.cos(thetaPrime2), p2.getRandVitesse() * Math.sin(thetaPrime2));
+                            Vecteur vitesse2XY = new Vecteur((n.getvX()*vitesse2NG.getvX()+g.getvX()*vitesse2NG.getvY()),(n.getvY()*vitesse2NG.getvX()+g.getvY()*vitesse2NG.getvY()));
+
                             p.setVitesse(vitesse1XY);
-                            choque = true;
+                            p2.setVitesse(vitesse2XY);
+
+                            //choque = true;
                             coli = p2;
+                            this.setEnChoc(true);
+                            coli.setEnChoc(true);
                         }
                     }
                 }
@@ -207,10 +233,10 @@ public class Planete
                 tpsDebut = System.currentTimeMillis();
                 deltaT = tpsDebut - tpsFin;
 
-                if(!choque) {
-                    vitesse.setvX(vitesse.getvX() + acceleration * Math.cos(Math.toRadians(angleRotation)));
-                    vitesse.setvY(vitesse.getvY() + acceleration * Math.sin(Math.toRadians(angleRotation)));
-                }
+
+                vitesse.setvX(vitesse.getvX() + acceleration * Math.cos(Math.toRadians(angleRotation)));
+                vitesse.setvY(vitesse.getvY() + acceleration * Math.sin(Math.toRadians(angleRotation)));
+
 
                 //On calcul la nouvelle position
                 posX = posX + (vitesse.getvX() * deltaT);

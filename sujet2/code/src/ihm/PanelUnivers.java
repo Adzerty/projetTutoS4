@@ -1,7 +1,5 @@
 package ihm;
 
-import metier.*;
-
 import javax.imageio.ImageIO;
 import metier.Coordonnees;
 import metier.Planete;
@@ -12,10 +10,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
-
 
 public class PanelUnivers extends JPanel implements KeyListener
 {
@@ -62,32 +57,6 @@ public class PanelUnivers extends JPanel implements KeyListener
             }
         }
 
-        /*planetes.add(new Planete(false, this));
-        planetes.add(new Planete(false, this));
-
-        planetes.get(0).angleRotation = -180;
-        planetes.get(1).angleRotation = 0;
-
-        planetes.get(0).setPosX(0);
-        planetes.get(1).setPosX(300);
-
-        planetes.get(0).setPosY(300);
-        planetes.get(1).setPosY(300);
-
-        planetes.get(0).setVitesse( new Vecteur(planetes.get(0).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(0).angleRotation)), planetes.get(0).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(0).angleRotation))));
-        planetes.get(1).setVitesse( new Vecteur(planetes.get(1).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(1).angleRotation)), planetes.get(1).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(1).angleRotation))));
-
-        planetes.get(0).startDeplacementPlanete();
-        planetes.get(1).startDeplacementPlanete();
-
-        planetes.get(0).setTaille(40);
-        planetes.get(1).setTaille(40);
-
-        System.out.println(planetes.get(0).toString());
-        System.out.println(planetes.get(1).toString());*/
-        //planetes.get(1).debug = true;
-
-
         this.addKeyListener(this);
 
         //On commence le thread de deplacement du vaisseau
@@ -95,7 +64,6 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         //On commence le thread de check de collisions
         //this.checkCollisions();
-        //this.checkCollisionsPlanetes();
     }
 
     public void checkCollisions()
@@ -147,69 +115,6 @@ public class PanelUnivers extends JPanel implements KeyListener
         });
         check.start();
     }
-
-    public void checkCollisionsPlanetes()
-    {
-        Thread threadColP = new Thread(() ->
-        {
-            boolean bool = false;
-            while (true)
-            {
-                for(Planete p : planetes)
-                {
-                    for(Planete p2 : planetes )
-                    {
-                        if(p != p2 && !p.estPandora() && !p2.estPandora())
-                        {
-                            //System.out.println(p.getVitesse().toString() + " " + p2.getVitesse().toString());
-                            //On calcul la distance entre la planete et chaque pixel du vaisseau
-                            double distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
-
-                            if(distance <= (p.getTaille() / 2  + p2.getTaille() / 2) /*&& pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2*/)
-                            {
-
-                                //QDM
-                                Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
-                                Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
-                                Vecteur pp0 = pp1.addition(pp2);
-
-                                //Energie cinetique
-                                double Ec = ( (Math.pow(pp1.getvX(),2) + (Math.pow(pp1.getvY(),2))) / (2*p.getMass())) + ((Math.pow(pp2.getvX(),2) + (Math.pow(pp2.getvY(),2))) / (2*p2.getMass()));
-
-                                //pPrimeY
-                                double p1PrimeY = pp1.getvY();
-                                double p2PrimeY = pp2.getvY();
-
-                                //pPrimeX
-                                double p1PrimeX = (p.getMass()*pp0.getvX() - Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2)) / (p.getMass() +p2.getMass());
-                                double p2PrimeX = (p2.getMass()*pp0.getvX() + Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*Math.pow(pp1.getvY(),2) - p.getMass()*Math.pow(pp2.getvY(),2)) - p.getMass()*p2.getMass()*Math.pow(pp0.getvX(),2)),1/2)) / (p.getMass() + p2.getMass());
-
-                                //angles
-                                double thetaPrime1 = Math.tan(p1PrimeY / p1PrimeX);
-                                double thetaPrime2 = Math.tan(p2PrimeY / p2PrimeX);
-                                //System.out.println(p1PrimeX + " " + p1PrimeY);
-                                //System.out.println(p2PrimeX + " " + p2PrimeY);
-                                //System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
-
-                                p.angleRotation = Math.toDegrees(thetaPrime1);
-                                p2.angleRotation = Math.toDegrees(thetaPrime2);
-
-                                //vitesses
-                                p.setVitesse(  new Vecteur(p.getRandVitesse()*Math.cos(thetaPrime1), p.getRandVitesse()*Math.sin(thetaPrime1)));
-                                p2.setVitesse( new Vecteur(p2.getRandVitesse()*Math.cos(thetaPrime2), p2.getRandVitesse()*Math.sin(thetaPrime2)));
-                            }
-                            while(distance <= (p.getTaille() / 2  + p2.getTaille() / 2))
-                            {
-                                distance = Math.sqrt( Math.pow(p.getPosX() - p2.getPosX(), 2) + Math.pow(p.getPosY() - p2.getPosY(), 2) );
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        threadColP.start();
-    }
-
     public void setCoods(Coordonnees coods) {
         this.coods = coods;
     }
