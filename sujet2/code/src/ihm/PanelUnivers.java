@@ -53,12 +53,12 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        /*for (int i=0; i<nbPlanetes; i++) {
+        for (int i=0; i<nbPlanetes; i++) {
             planetes.add(new Planete(false, this));
             planetes.get(i).startDeplacementPlanete();
-        }*/
+        }
 
-        planetes.add(new Planete(false, this));
+       /* planetes.add(new Planete(false, this));
         planetes.add(new Planete(false, this));
 
         planetes.get(0).angleRotation = -180;
@@ -74,7 +74,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         planetes.get(1).setVitesse( new Vecteur(planetes.get(1).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(1).angleRotation)), planetes.get(1).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(1).angleRotation))));
 
         planetes.get(0).startDeplacementPlanete();
-        planetes.get(1).startDeplacementPlanete();
+        planetes.get(1).startDeplacementPlanete();*/
 
 
 
@@ -162,86 +162,21 @@ public class PanelUnivers extends JPanel implements KeyListener
 
                             if(distance <= (p.getTaille()/2  + p2.getTaille()/2))
                             {
+                                double thetaPrime1 = Math.atan( (p.getMass() - p2.getMass())/(p.getMass() + p2.getMass()) * Math.tan(Math.toRadians(p.angleRotation)) + ((2*p2.getMass())/(p.getMass() + p2.getMass())) * ((p2.getRandVitesse())/(p.getRandVitesse())) * ((Math.sin(Math.toRadians(p2.angleRotation)))/(Math.cos(Math.toRadians(p.angleRotation)))));
+                                double thetaPrime2 = Math.atan( (p2.getMass() - p.getMass())/(p.getMass() + p2.getMass()) * Math.tan(Math.toRadians(p2.angleRotation)) + ((2*p.getMass())/(p.getMass() + p2.getMass())) * ((p.getRandVitesse())/(p2.getRandVitesse())) * ((Math.sin(Math.toRadians(p.angleRotation)))/(Math.cos(Math.toRadians(p2.angleRotation)))));
 
-                                //QDM
-                                Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
-                                Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
-                                Vecteur pp0 = pp1.addition(pp2);
+                                double newVit1 = Math.sqrt( (( ((p.getMass() - p2.getMass())/(p.getMass()+p2.getMass()))*p.getRandVitesse()*Math.sin(Math.toRadians(p.angleRotation)) + ((2*p2.getMass())/(p.getMass()+p2.getMass()))*p2.getRandVitesse()*Math.sin(Math.toRadians(p2.angleRotation)) )*(( ((p.getMass() - p2.getMass())/(p.getMass()+p2.getMass()))*p.getRandVitesse()*Math.sin(Math.toRadians(p.angleRotation)) + ((2*p2.getMass())/(p.getMass()+p2.getMass()))*p2.getRandVitesse()*Math.sin(Math.toRadians(p2.angleRotation)) )) + ((p.getRandVitesse()*Math.cos(Math.toRadians(p.angleRotation)))*((p.getRandVitesse()*Math.cos(Math.toRadians(p.angleRotation)))) )));
+                                double newVit2 = Math.sqrt( (( ((p2.getMass() - p.getMass())/(p.getMass()+p2.getMass()))*p2.getRandVitesse()*Math.sin(Math.toRadians(p2.angleRotation)) + ((2*p.getMass())/(p.getMass()+p2.getMass()))*p.getRandVitesse()*Math.sin(Math.toRadians(p.angleRotation)) )*(( ((p2.getMass() - p.getMass())/(p.getMass()+p2.getMass()))*p2.getRandVitesse()*Math.sin(Math.toRadians(p2.angleRotation)) + ((2*p.getMass())/(p.getMass()+p2.getMass()))*p.getRandVitesse()*Math.sin(Math.toRadians(p.angleRotation)) )) + ((p2.getRandVitesse()*Math.cos(Math.toRadians(p2.angleRotation)))*((p2.getRandVitesse()*Math.cos(Math.toRadians(p2.angleRotation)))) )));
 
-                                //System.out.println("----------- DEBUG ------------");
-
-                                //System.out.println("p1 vitesse : " + p.getVitesse());
-                                //System.out.println("p2 vitesse : " + p2.getVitesse());
-
-                                //System.out.println("p1 angle : " + p.angleRotation);
-                                //System.out.println("p2 angle : " + p2.angleRotation);
-
-                                //System.out.println("p1 masse : " + p.getMass());
-                                //System.out.println("p2 masse : " + p2.getMass());
-
-
-                                //System.out.println(" --------------------------- ");
-
-                                //System.out.println("pp1 : " + pp1 );
-                                //System.out.println("pp2 : " + pp2 );
-                                //System.out.println("pp0 : " + pp0 );
-
-
-                                //Energie cinetique
-                                double Ec = ((pp1.getvX()*pp1.getvX() + pp1.getvY()*pp1.getvY()) / (2*p.getMass())) + ((pp2.getvX()*pp2.getvX() + pp2.getvY()*pp2.getvY()) / (2*p2.getMass()));
-
-                                //System.out.println(" --------------------------- ");
-
-                                //System.out.println("Ec : " + Ec );
-
-                                //pPrimeY
-                                double p1PrimeY = pp1.getvY();
-                                double p2PrimeY = pp2.getvY();
-
-                                //pPrimeX
-
-                                double etapePuissance1Demi = ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())) /
-                                        ( ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())) * ((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())));
-                                double p1PrimeX = (p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass());
-                                double p2PrimeX = (p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass());
-
-                                //System.out.println(" --------------------------- ");
-
-                                //System.out.println("p1PrimeX : " + p1PrimeX );
-                                //System.out.println("p2PrimeX : " + p2PrimeX );
-
-                                //angles
-                                double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
-                                double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
-
-
-                                if(p1PrimeX < 0)
-                                    if(p1PrimeY > 0)
-                                        thetaPrime1 += Math.PI/2;
-                                    else
-                                        thetaPrime1 -= Math.PI/2;
-
-                                if(p2PrimeX< 0)
-                                    if(p2PrimeY > 0)
-                                        thetaPrime2 -= Math.PI/2;
-                                    else
-                                        thetaPrime2 += Math.PI/2;
-
-                                //System.out.println(" --------------------------- ");
-
-                                //System.out.println("tPrime1 : " + Math.toDegrees(thetaPrime1));
-                                //System.out.println("tPrime2 : " + Math.toDegrees(thetaPrime2));
-
-                                //System.out.println(p1PrimeX + " " + p1PrimeY);
-                                //System.out.println(p2PrimeX + " " + p2PrimeY);
-                                //System.out.println(Math.toDegrees(thetaPrime1) + " " + Math.toDegrees(thetaPrime2));
 
                                 p.angleRotation = Math.toDegrees(thetaPrime1);
                                 p2.angleRotation = Math.toDegrees(thetaPrime2);
 
-                                //vitesses
-                                p.setVitesse(  new Vecteur(p.getRandVitesse()*Math.cos(thetaPrime1), p.getRandVitesse()*Math.sin(thetaPrime1)));
-                                p2.setVitesse( new Vecteur(p2.getRandVitesse()*Math.cos(thetaPrime2), p2.getRandVitesse()*Math.sin(thetaPrime2)));
+                                p.setRandVitesse(newVit1);
+                                p2.setRandVitesse(newVit2);
+
+                                p.setVitesse(new Vecteur(p.getRandVitesse()*Math.cos(Math.toRadians(p.angleRotation)), p.getRandVitesse()*Math.sin(Math.toRadians(p.angleRotation))));
+                                p2.setVitesse(new Vecteur(p2.getRandVitesse()*Math.cos(Math.toRadians(p2.angleRotation)), p2.getRandVitesse()*Math.sin(Math.toRadians(p2.angleRotation))));
 
                             }
 

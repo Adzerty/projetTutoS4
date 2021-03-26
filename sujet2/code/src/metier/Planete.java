@@ -221,4 +221,8 @@ public class Planete
     public double getRandVitesse() {
         return randVitesse;
     }
+
+    public void setRandVitesse(double randVitesse) {
+        this.randVitesse = randVitesse;
+    }
 }
