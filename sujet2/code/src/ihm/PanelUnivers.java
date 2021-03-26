@@ -31,8 +31,6 @@ public class PanelUnivers extends JPanel implements KeyListener
 
     private final int ANGLE_ROTATION = 5;
 
-
-
     private double angleOffset = (3*Math.PI)/2;
 
     public PanelUnivers(int nbPlanetes)
@@ -47,12 +45,16 @@ public class PanelUnivers extends JPanel implements KeyListener
 
         this.planetes = new ArrayList<>();
 
+        planetes.add(new Planete(true, this));
         //On ajoute les planetes au panel
-        for (int i=0; i<=nbPlanetes; i++)
-            if (i == 0) planetes.add(new Planete(true, this));
-            else planetes.add(new Planete(false, this));
+        for (int i=0; i<nbPlanetes; i++)
+            planetes.add(new Planete(false, this));
 
-        for (Planete p : planetes) p.startDeplacementPlanete();
+
+
+        for (Planete p : planetes)
+            if(!p.estPandora())
+                p.startDeplacementPlanete();
 
         this.addKeyListener(this);
 
@@ -100,6 +102,7 @@ public class PanelUnivers extends JPanel implements KeyListener
                                 this.gameOver = true;
                                 this.vaisseau.stopDeplacement();
                             }else {
+                                this.gameOver = true;
                                 this.aTouche = true;
                             }
 
