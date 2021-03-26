@@ -134,32 +134,20 @@ public class Planete
             while (true)
             {
                 Planete p = this;
-                /*if(coli != null && this.isEnChoc() && Math.sqrt( ((p.getPosX() - coli.getPosX()) * (p.getPosX() - coli.getPosX())) + ( (p.getPosY() - coli.getPosY()) * (p.getPosY() - coli.getPosY()))) > (p.getTaille() / 2 + coli.getTaille() / 2)) {
-                    coli.setEnChoc(false);
-                    this.setEnChoc(false);
-                    coli = null;
-                    System.out.println("Plus en choc connard");
-                }
-                else if(coli != null){
-                    //System.out.println("aie fdp");
-                }*/
-                if(choque && Math.sqrt( ((p.getPosX() - coli.getPosX()) * (p.getPosX() - coli.getPosX())) + ( (p.getPosY() - coli.getPosY()) * (p.getPosY() - coli.getPosY()))) > (p.getTaille() / 2 + coli.getTaille() / 2))
-                  choque = false;
+                if(choque && Math.sqrt( ((p.getPosX() - coli.getPosX()) * (p.getPosX() - coli.getPosX())) + ( (p.getPosY() - coli.getPosY()) * (p.getPosY() - coli.getPosY()))) > (p.getTaille() / 2 + coli.getTaille() / 2)) choque = false;
+
                 for(Planete p2 : panelUnivers.getPlanetes()) {
-                    if(p != p2 && !p.estPandora() && !p2.estPandora()) {
+                    if(p != p2 && !p.estPandora() && !p2.estPandora())
+                    {
                         double distance = Math.sqrt( ((p.getPosX() - p2.getPosX()) * (p.getPosX() - p2.getPosX())) + ( (p.getPosY() - p2.getPosY()) * (p.getPosY() - p2.getPosY())));
-
-                        if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) && !choque/*&& coli != p2*/ /*&& !this.enChoc/*&& pco1 != p && p2 != pco2 && pco2 != p && pco1 != p2*/) {
+                        if (distance <= (p.getTaille() / 2 + p2.getTaille() / 2) && !choque )
+                        {
                             //QDM
-
                             Vecteur pp1 = p.getVitesse().multiplication(p.getMass());
-                            //System.out.println("pp1 : " + pp1);
                             Vecteur pp2 = p2.getVitesse().multiplication(p2.getMass());
                             Vecteur pp0 = pp1.addition(pp2);
 
                             //Energie cinetique
-                            //double Ec = ((pp1.getvX()*pp1.getvX() + pp1.getvY()*pp1.getvY()) / (2*p.getMass())) + ((pp2.getvX()*pp2.getvX() + pp2.getvY()*pp2.getvY()) / (2*p2.getMass()));
-                            //double Ec = ((Math.pow(pp1.getvX(), 2) + (Math.pow(pp1.getvY(), 2))) / (2 * p.getMass())) + ((Math.pow(pp2.getvX(), 2) + (Math.pow(pp2.getvY(), 2))) / (2 * p2.getMass()));
                             double Ec = (((pp1.getvX()*pp1.getvX() + pp1.getvY()*pp1.getvY()) / (2*p.getMass())) + ((pp2.getvX()*pp2.getvX() + pp2.getvY()*pp2.getvY()) / (2*p2.getMass())));
 
                             //pPrimeY
@@ -167,31 +155,16 @@ public class Planete
                             double p2PrimeY = pp2.getvY();
 
                             //pPrimeX
-                            //double p1PrimeX = (p.getMass() * pp0.getvX() - Math.pow(((p.getMass() + p2.getMass()) * (2 * p.getMass() * p2.getMass() * Ec - p2.getMass() * Math.pow(pp1.getvY(), 2) - p.getMass() * Math.pow(pp2.getvY(), 2)) - p.getMass() * p2.getMass() * Math.pow(pp0.getvX(), 2)), 1 / 2)) / (p.getMass() + p2.getMass());
-                            //double p2PrimeX = (p2.getMass() * pp0.getvX() + Math.pow(((p.getMass() + p2.getMass()) * (2 * p.getMass() * p2.getMass() * Ec - p2.getMass() * Math.pow(pp1.getvY(), 2) - p.getMass() * Math.pow(pp2.getvY(), 2)) - p.getMass() * p2.getMass() * Math.pow(pp0.getvX(), 2)), 1 / 2)) / (p.getMass() + p2.getMass());
-                            /*double etapePuissance1Demi = Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())),0.5);
-
-                            double p1PrimeX = (p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass());
-                            double p2PrimeX = (p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass());*/
-
-                            /*double etapePuissance1Demi =(long) Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())),0.5);
-                            double p1PrimeX =(long) ((p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass()));
-                            double p2PrimeX =(long) ((p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass()));*/
                             double etapePuissance1Demi = Math.pow(((p.getMass() + p2.getMass())*(2*p.getMass()*p2.getMass()*Ec - p2.getMass()*(pp1.getvY()*pp1.getvY()) - p.getMass()*(pp2.getvY()*pp2.getvY())) - p.getMass()*p2.getMass()*(pp0.getvX()*pp0.getvX())),0.5);
                             double p1PrimeX = ((p.getMass()*pp0.getvX() - etapePuissance1Demi )/ (p.getMass() +p2.getMass()));
                             double p2PrimeX = ((p2.getMass()*pp0.getvX() + etapePuissance1Demi)/ (p.getMass() + p2.getMass()));
+
                             //angles
                             double thetaPrime1 = Math.atan(p1PrimeY / p1PrimeX);
                             double thetaPrime2 = Math.atan(p2PrimeY / p2PrimeX);
 
 
-                            if(p1PrimeX > -0 && !(p1PrimeY >-0) || !(p1PrimeX > -0)&& (p1PrimeY >-0)) thetaPrime1 += Math.PI;
-                            /*if(p1PrimeX < -0 ) {
-                                thetaPrime1 -= Math.PI/2;
-                                if(p1PrimeY < -0) thetaPrime1 -= Math.PI/2;
-                            }*/
-
-
+                            if(p1PrimeX > -0) thetaPrime1 += Math.PI;
 
                             p.angleRotation = Math.toDegrees(thetaPrime1);
                             p2.angleRotation = Math.toDegrees(thetaPrime2);
@@ -201,14 +174,6 @@ public class Planete
                             //Vecteur vitesseTemp2=new Vecteur(p2.getRandVitesse() * Math.cos(thetaPrime2), p2.getRandVitesse() * Math.sin(thetaPrime2));
                             p.setVitesse(vitesseTemp1);
                             //p2.setVitesse(vitesseTemp2);
-
-                            coli = p2;
-                            //System.out.println("energie cinetique : " + Ec);
-                            //System.out.println("vitesse get :" + p2.getVitesse());
-                            //System.out.println("vitesse calculé: " + vitesseTemp1);
-
-                            //coli.setEnChoc(true);
-                            //this.setEnChoc(true);
 
                             choque = true;
                         }
