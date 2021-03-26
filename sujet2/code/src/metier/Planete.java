@@ -99,7 +99,7 @@ public class Planete
         this.taille = (int)(MIN + (Math.random() * (MAX - MIN)));
         this.coord = new Coordonnees(x,y);
 
-        this.mass = Math.PI * Math.pow(this.taille/2,2);
+        this.mass = Math.PI * Math.pow(this.taille,2);
 
         }
 
