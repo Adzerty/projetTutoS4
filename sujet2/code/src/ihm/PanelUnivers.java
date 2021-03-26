@@ -48,14 +48,11 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=0; i<=nbPlanetes; i++) {
-            if (i == 0) {
-                planetes.add(new Planete(true, this));
-            } else {
-                planetes.add(new Planete(false, this));
-                planetes.get(i).startDeplacementPlanete();
-            }
-        }
+        for (int i=0; i<=nbPlanetes; i++)
+            if (i == 0) planetes.add(new Planete(true, this));
+            else planetes.add(new Planete(false, this));
+
+        for (Planete p : planetes) p.startDeplacementPlanete();
 
         this.addKeyListener(this);
 
