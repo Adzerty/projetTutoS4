@@ -62,6 +62,29 @@ public class PanelUnivers extends JPanel implements KeyListener
             }
         }
 
+        /*planetes.add(new Planete(false, this));
+        planetes.add(new Planete(false, this));
+
+        planetes.get(0).angleRotation = -180;
+        planetes.get(1).angleRotation = 0;
+
+        planetes.get(0).setPosX(0);
+        planetes.get(1).setPosX(300);
+
+        planetes.get(0).setPosY(300);
+        planetes.get(1).setPosY(300);
+
+        planetes.get(0).setVitesse( new Vecteur(planetes.get(0).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(0).angleRotation)), planetes.get(0).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(0).angleRotation))));
+        planetes.get(1).setVitesse( new Vecteur(planetes.get(1).getRandVitesse()*Math.cos(Math.toRadians(planetes.get(1).angleRotation)), planetes.get(1).getRandVitesse()*Math.sin(Math.toRadians(planetes.get(1).angleRotation))));
+
+        planetes.get(0).startDeplacementPlanete();
+        planetes.get(1).startDeplacementPlanete();
+
+        planetes.get(0).setTaille(40);
+        planetes.get(1).setTaille(40);
+
+        System.out.println(planetes.get(0).toString());
+        System.out.println(planetes.get(1).toString());*/
         //planetes.get(1).debug = true;
 
 
