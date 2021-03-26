@@ -75,8 +75,8 @@ public class Planete
 
         if (this.estPandora()){
 
-            x = 300+(int)(Math.random() * ( TAILLE_FRAME - 300));
-            y = 200+(int)(Math.random() * ( TAILLE_FRAME - 200));
+            x = (TAILLE_FRAME/3*2) + (int)(Math.random() * ((TAILLE_FRAME-50) - (TAILLE_FRAME/3*2)));
+            y = 50+(int)(Math.random() * ( TAILLE_FRAME - 50));
             this.coord = new Coordonnees(x,y);
             this.taille = 50;
         }
@@ -310,34 +310,5 @@ public class Planete
 
     public void setTaille(int taille) {
         this.taille = taille;
-    }
-
-    @Override
-    public String toString() {
-        return "Planete{" +
-                "coord=" + coord +
-                ", taille=" + taille +
-                ", imgP=" + imgP +
-                ", pandora=" + pandora +
-                ", enChoc=" + enChoc +
-                ", threadDep=" + threadDep +
-                ", threadCol=" + threadCol +
-                ", angleRotation=" + angleRotation +
-                ", posX=" + posX +
-                ", posY=" + posY +
-                ", MAX_VITESSE=" + MAX_VITESSE +
-                ", MIN_VITESSE=" + MIN_VITESSE +
-                ", vitesse=" + vitesse +
-                ", randVitesse=" + randVitesse +
-                ", acceleration=" + acceleration +
-                ", decelerarion=" + decelerarion +
-                ", deltaT=" + deltaT +
-                ", tpsDebut=" + tpsDebut +
-                ", tpsFin=" + tpsFin +
-                ", calculCollisionFait=" + calculCollisionFait +
-                ", mass=" + mass +
-                ", panelUnivers=" + panelUnivers +
-                ", debug=" + debug +
-                '}';
     }
 }
