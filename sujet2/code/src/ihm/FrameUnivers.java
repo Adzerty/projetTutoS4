@@ -35,5 +35,8 @@ public class FrameUnivers extends JFrame
         this.setVisible(true);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+    public PanelUnivers getPanelUniv(){
+        return this.panelUniv;
+    }
 
 }

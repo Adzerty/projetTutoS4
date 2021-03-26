@@ -193,6 +193,7 @@ public class PanelUnivers extends JPanel implements KeyListener
                 this.gameOver = true;
             }
 
+
             if (!gameOver) //Si le jeu n'est pas game over on gere l'affichage en transparence de la flamme
             {
                 float vitesse = (float) vaisseau.getVitesse().getNorme() * 10;
@@ -216,6 +217,13 @@ public class PanelUnivers extends JPanel implements KeyListener
                 }
             }
 
+    }
+
+    public ArrayList<Planete> getPlanetes(){
+        return this.planetes;
+    }
+    public Vaisseau getVaisseau(){
+        return this.vaisseau;
     }
 
     //Methode pour tourner le vaisseau
@@ -254,6 +262,8 @@ public class PanelUnivers extends JPanel implements KeyListener
             this.vaisseau.setAcceleration(0);
         }
     }
+
+
 
 
 }
