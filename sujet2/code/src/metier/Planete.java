@@ -102,7 +102,7 @@ public class Planete
         this.coord = new Coordonnees(x,y);
 
         //System.out.println(taille);
-        //this.mass = Math.PI * (this.taille/2)*(this.taille/2);
+        this.mass = Math.PI * (this.taille/2)*(this.taille/2);
 
         }
 

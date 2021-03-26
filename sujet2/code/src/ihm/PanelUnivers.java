@@ -60,7 +60,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.vaisseau.startDeplacement();
 
         //On commence le thread de check de collisions
-        //this.checkCollisions();
+        this.checkCollisions();
     }
 
     public void checkCollisions()
