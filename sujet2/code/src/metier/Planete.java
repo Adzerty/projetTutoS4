@@ -210,17 +210,17 @@ public class Planete
                                     thetaPrime2-=Math.PI;
 
                             p.angleRotation = Math.toDegrees(thetaPrime1);
-                            p.angleRotation = Math.toDegrees(thetaPrime2);
+                            p2.angleRotation = Math.toDegrees(thetaPrime2);
 
                             //vitesses 1
-                            Vecteur vitesse1NG = new Vecteur(p.getRandVitesse() * Math.cos(thetaPrime1), p.getRandVitesse() * Math.sin(thetaPrime1));
+                            Vecteur vitesse1NG = new Vecteur(p.getRandVitesse() * Math.cos(thetaPrime2), p.getRandVitesse() * Math.sin(thetaPrime2));
                             Vecteur vitesse1XY = new Vecteur((n.getvX()*vitesse1NG.getvX()+g.getvX()*vitesse1NG.getvY()),(n.getvY()*vitesse1NG.getvX()+g.getvY()*vitesse1NG.getvY()));
                             //vitesse 2
-                            Vecteur vitesse2NG = new Vecteur(p2.getRandVitesse() * Math.cos(thetaPrime2), p2.getRandVitesse() * Math.sin(thetaPrime2));
+                            Vecteur vitesse2NG = new Vecteur(p2.getRandVitesse() * Math.cos(thetaPrime1), p2.getRandVitesse() * Math.sin(thetaPrime1));
                             Vecteur vitesse2XY = new Vecteur((n.getvX()*vitesse2NG.getvX()+g.getvX()*vitesse2NG.getvY()),(n.getvY()*vitesse2NG.getvX()+g.getvY()*vitesse2NG.getvY()));
 
-                            p.setVitesse(vitesse1XY);
-                            p2.setVitesse(vitesse2XY);
+                            p.setVitesse(vitesse2XY);
+                            p2.setVitesse(vitesse1XY);
 
                             //choque = true;
                             coli = p2;
