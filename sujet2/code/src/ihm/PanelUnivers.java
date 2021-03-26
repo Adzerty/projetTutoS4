@@ -1,7 +1,5 @@
 package ihm;
 
-import metier.*;
-
 import javax.imageio.ImageIO;
 import metier.Coordonnees;
 import metier.Planete;
@@ -12,10 +10,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
-
 
 public class PanelUnivers extends JPanel implements KeyListener
 {
@@ -53,15 +48,11 @@ public class PanelUnivers extends JPanel implements KeyListener
         this.planetes = new ArrayList<>();
 
         //On ajoute les planetes au panel
-        for (int i=0; i<=nbPlanetes; i++){
-            if (i == 0){
-                planetes.add(new Planete(true, this));
-            }
-            else {
-                planetes.add(new Planete(false, this));
-                planetes.get(i).startDeplacementPlanete();
-            }
-        }
+        for (int i=0; i<=nbPlanetes; i++)
+            if (i == 0) planetes.add(new Planete(true, this));
+            else planetes.add(new Planete(false, this));
+
+        for (Planete p : planetes) p.startDeplacementPlanete();
 
         this.addKeyListener(this);
 
@@ -121,7 +112,6 @@ public class PanelUnivers extends JPanel implements KeyListener
         });
         check.start();
     }
-
     public void setCoods(Coordonnees coods) {
         this.coods = coods;
     }
@@ -255,5 +245,7 @@ public class PanelUnivers extends JPanel implements KeyListener
         }
     }
 
-
+    public ArrayList<Planete> getPlanetes() {
+        return planetes;
+    }
 }

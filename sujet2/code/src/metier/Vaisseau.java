@@ -121,7 +121,7 @@ public class Vaisseau {
                 double vitFinal = vitInit.getNorme() - (deltaT * decelerarion);
 
                 // On reduit la vitesse
-                if(vitInit.getNorme() != 0)
+                if(vitInit.getNorme() != 0 &&  acceleration == 0)
                 {
                     v.vitesse.setvX(v.vitesse.getvX() * (vitFinal / vitInit.getNorme()));
                     v.vitesse.setvY(v.vitesse.getvY() * (vitFinal / vitInit.getNorme()));
@@ -138,6 +138,7 @@ public class Vaisseau {
                 v.panelUnivers.repaint();
 
                 v.tpsFin = System.currentTimeMillis();
+
                 try {Thread.sleep(10);} catch(InterruptedException e){e.printStackTrace();}
             }
         });
