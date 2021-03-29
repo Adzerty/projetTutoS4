@@ -1,16 +1,13 @@
 package ihm;
 
-import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class FrameUnivers extends JFrame
@@ -48,17 +45,24 @@ public class FrameUnivers extends JFrame
     {
         InputStream music;
         try{
-            File musicPath = new File(FrameUnivers.class.getResource(musicLocation).toURI());
-            if(musicPath.exists())
-            {
-                AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
-                Clip clip = AudioSystem.getClip();
-                clip.open(audioInput);
-                clip.loop(Clip.LOOP_CONTINUOUSLY);
-                clip.start();
-            }else
-                System.out.println("CA MARCHE PAS");
-        }catch(Exception e){ e.printStackTrace(); }
+            //File musicPath = new File(FrameUnivers.class.getResource(musicLocation).toURI());
+            InputStream audioSrc = FrameUnivers.class.getResourceAsStream(musicLocation);
+            InputStream bufferedIn = new BufferedInputStream(audioSrc);
+            AudioInputStream audioInput = AudioSystem.getAudioInputStream(bufferedIn);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInput);
+
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+
+            float volume = 0.5f;
+            float range = gainControl.getMaximum() - gainControl.getMinimum();
+            float gain = (range * volume) + gainControl.getMinimum();
+            gainControl.setValue(gain);
+
+
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        } catch(Exception e){ e.printStackTrace(); }
     }
 
 }
